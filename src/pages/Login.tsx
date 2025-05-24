@@ -1,12 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
 
 const Login = () => {
   const { currentUser, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     if (currentUser) {
@@ -22,6 +24,10 @@ const Login = () => {
     }
   };
 
+  const toggleHelp = () => {
+    setShowHelp(!showHelp);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-muted/50">
       <header className="p-4 flex justify-center border-b bg-background/80 backdrop-blur-md">
@@ -30,7 +36,7 @@ const Login = () => {
         </h1>
       </header>
       
-      <main className="flex-1 flex items-center justify-center p-4">
+      <main className="flex-1 flex flex-col items-center justify-center p-4 gap-4">
         <Card className="w-full max-w-[350px] border-none shadow-lg">
           <CardHeader className="space-y-1 text-center">
             <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
@@ -84,6 +90,46 @@ const Login = () => {
               By signing in, you agree to our Terms of Service and Privacy Policy
             </p>
           </CardFooter>
+        </Card>
+
+        <Card className="w-full max-w-[350px] border-none shadow-lg overflow-hidden">
+          <Button 
+            variant="ghost" 
+            className="w-full flex items-center justify-between p-4 rounded-none border-b"
+            onClick={toggleHelp}
+          >
+            <div className="flex items-center gap-2">
+              <HelpCircle className="h-4 w-4" />
+              <span className="font-medium">How to Use HabitFlow</span>
+            </div>
+            {showHelp ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
+          
+          {showHelp && (
+            <div className="p-4 text-sm">
+              <div className="space-y-3">
+                <div>
+                  <h3 className="font-medium mb-1">1. Track Your Habits</h3>
+                  <p className="text-muted-foreground text-xs">Create habits you want to build or break. Check them off daily to build streaks.</p>
+                </div>
+                
+                <div>
+                  <h3 className="font-medium mb-1">2. Understand Your Cravings</h3>
+                  <p className="text-muted-foreground text-xs">Log cravings when they happen. Identify cues, analyze feelings, and develop better responses.</p>
+                </div>
+                
+                <div>
+                  <h3 className="font-medium mb-1">3. Reflect on Progress</h3>
+                  <p className="text-muted-foreground text-xs">Review your habit stats and journal your thoughts to gain insights into your behavior patterns.</p>
+                </div>
+                
+                <div>
+                  <h3 className="font-medium mb-1">4. Build Better Systems</h3>
+                  <p className="text-muted-foreground text-xs">Focus on the process, not just outcomes. Small improvements compound over time.</p>
+                </div>
+              </div>
+            </div>
+          )}
         </Card>
       </main>
       
