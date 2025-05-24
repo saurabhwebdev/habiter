@@ -72,11 +72,11 @@ const Dashboard = () => {
                       <PlusCircle className="h-4 w-4 mr-1" /> Add Habit
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="bottom" className="h-[85vh] rounded-t-xl">
-                    <SheetHeader>
+                  <SheetContent side="bottom" className="h-[85vh] rounded-t-xl overflow-y-auto">
+                    <SheetHeader className="sticky top-0 bg-background z-10 pb-4">
                       <SheetTitle>Create New Habit</SheetTitle>
                     </SheetHeader>
-                    <div className="mt-4">
+                    <div className="pb-16">
                       <HabitForm onSubmit={handleAddHabit} />
                     </div>
                   </SheetContent>
@@ -103,11 +103,11 @@ const Dashboard = () => {
                       <PlusCircle className="h-4 w-4 mr-1" /> Log Craving
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="bottom" className="h-[85vh] rounded-t-xl">
-                    <SheetHeader>
+                  <SheetContent side="bottom" className="h-[85vh] rounded-t-xl overflow-y-auto">
+                    <SheetHeader className="sticky top-0 bg-background z-10 pb-4">
                       <SheetTitle>Log a Craving</SheetTitle>
                     </SheetHeader>
-                    <div className="mt-4">
+                    <div className="pb-16">
                       <CravingLogForm onSubmit={handleAddCravingLog} />
                     </div>
                   </SheetContent>
