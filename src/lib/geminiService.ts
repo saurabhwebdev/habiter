@@ -77,7 +77,12 @@ export const geminiService = {
    */
   async getMotivationalMessage(): Promise<string> {
     try {
-      const response = await fetch(API_URL, {
+      // Add a timeout to the fetch request
+      const timeoutPromise = new Promise<Response>((_, reject) => {
+        setTimeout(() => reject(new Error('Request timed out')), 5000);
+      });
+      
+      const fetchPromise = fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -112,17 +117,27 @@ export const geminiService = {
         })
       });
 
+      // Race between the fetch and the timeout
+      const response = await Promise.race([fetchPromise, timeoutPromise]) as Response;
+
       if (!response.ok) {
         throw new Error(`API request failed with status ${response.status}`);
       }
 
       const data: GeminiResponse = await response.json();
       
-      if (!data.candidates || data.candidates.length === 0) {
-        throw new Error('No response from Gemini API');
+      if (!data.candidates || data.candidates.length === 0 || 
+          !data.candidates[0].content || 
+          !data.candidates[0].content.parts || 
+          !data.candidates[0].content.parts[0].text) {
+        throw new Error('Invalid response format from Gemini API');
       }
 
       const message = data.candidates[0].content.parts[0].text.trim();
+      
+      if (!message || message.length < 5) {
+        throw new Error('Empty or too short message received');
+      }
       
       // Save successful message to Supabase for future use
       await this.saveMessageToSupabase(message);

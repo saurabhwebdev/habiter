@@ -11,6 +11,8 @@ export const MotivationalMessage: React.FC = () => {
   const [fadeState, setFadeState] = useState<'in' | 'out'>('in');
   const REFRESH_INTERVAL = 30; // seconds
   const messageContainerRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchMessage = useCallback(async () => {
     try {
@@ -26,7 +28,25 @@ export const MotivationalMessage: React.FC = () => {
       const motivationalMessage = await geminiService.getMotivationalMessage();
       setMessage(motivationalMessage);
       setFadeState('in');
+      
+      // Reset timer to full interval
       setTimeRemaining(REFRESH_INTERVAL);
+      
+      // Clear and restart the countdown timer
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+      }
+      
+      countdownRef.current = setInterval(() => {
+        setTimeRemaining(prev => {
+          if (prev <= 1) {
+            // Don't restart the countdown here - fetchMessage will do it
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
     } catch (error) {
       console.error('Failed to fetch motivational message:', error);
     } finally {
@@ -34,25 +54,22 @@ export const MotivationalMessage: React.FC = () => {
     }
   }, [message]);
 
+  // Initial fetch and timer setup
   useEffect(() => {
+    // Fetch the first message
     fetchMessage();
     
-    // Set up interval to refresh every 30 seconds
-    const refreshIntervalId = setInterval(() => {
+    // Set up timer to auto-refresh
+    timerRef.current = setInterval(() => {
       fetchMessage();
     }, REFRESH_INTERVAL * 1000);
     
-    // Set up countdown timer
-    const countdownIntervalId = setInterval(() => {
-      setTimeRemaining(prev => prev > 0 ? prev - 1 : REFRESH_INTERVAL);
-    }, 1000);
-    
-    // Clean up intervals on component unmount
+    // Clean up on unmount
     return () => {
-      clearInterval(refreshIntervalId);
-      clearInterval(countdownIntervalId);
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (countdownRef.current) clearInterval(countdownRef.current);
     };
-  }, [fetchMessage]);
+  }, []);
 
   return (
     <div className="bg-black/5 rounded-lg border border-black/10 shadow-sm overflow-hidden">
@@ -96,7 +113,7 @@ export const MotivationalMessage: React.FC = () => {
                 <span>New message in {timeRemaining}s</span>
               </div>
               <button 
-                onClick={fetchMessage} 
+                onClick={() => fetchMessage()} 
                 className="text-xs text-black/60 hover:text-black transition-colors"
               >
                 Refresh
