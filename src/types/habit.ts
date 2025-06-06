@@ -103,6 +103,36 @@ export interface DateRange {
   end: string;
 }
 
+export type MoodType = 'great' | 'good' | 'neutral' | 'bad' | 'terrible';
+
+export interface JournalEntry {
+  id: string;
+  habit_id: string;
+  user_id: string;
+  date: string;
+  content: string;
+  mood?: string;
+  triggers?: string[];
+  urge_level?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NewJournalEntry {
+  habit_id: string;
+  content: string;
+  mood?: string;
+  triggers?: string[];
+  urge_level?: number;
+}
+
+export interface JournalFilters {
+  habit_id?: string;
+  date_range?: DateRange;
+  mood?: string;
+  search?: string;
+}
+
 export const DEFAULT_ICONS: Record<string, string> = {
   water: '💧',
   smoking: '🚬',

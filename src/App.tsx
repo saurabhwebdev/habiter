@@ -16,6 +16,7 @@ import EmailPreview from "./pages/EmailPreview";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Statistics from "./pages/Statistics";
+import Journal from "./pages/Journal";
 import Help from "./pages/Help";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
@@ -53,6 +54,11 @@ const App = () => (
             <Route path="/statistics" element={
               <ProtectedRoute>
                 <Statistics />
+              </ProtectedRoute>
+            } />
+            <Route path="/journal" element={
+              <ProtectedRoute>
+                <Journal />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

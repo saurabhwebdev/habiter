@@ -9,7 +9,10 @@ import {
   HabitFilters,
   DateRange,
   MoneySaving,
-  NewMoneySaving
+  NewMoneySaving,
+  JournalEntry,
+  NewJournalEntry,
+  JournalFilters
 } from '@/types/habit';
 
 export const habitService = {
@@ -452,5 +455,120 @@ export const habitService = {
     );
     
     return habitsWithProgress;
-  }
+  },
+  
+  // Journal operations
+  async getJournalEntries(filters?: JournalFilters): Promise<JournalEntry[]> {
+    let query = supabase
+      .from('journal_entries')
+      .select('*');
+    
+    // Apply filters if provided
+    if (filters) {
+      if (filters.habit_id) {
+        query = query.eq('habit_id', filters.habit_id);
+      }
+      
+      if (filters.date_range) {
+        query = query
+          .gte('date', filters.date_range.start)
+          .lte('date', filters.date_range.end);
+      }
+      
+      if (filters.mood) {
+        query = query.eq('mood', filters.mood);
+      }
+      
+      if (filters.search) {
+        query = query.ilike('content', `%${filters.search}%`);
+      }
+    }
+    
+    query = query.order('created_at', { ascending: false });
+    
+    const { data, error } = await query;
+    
+    if (error) {
+      console.error('Error fetching journal entries:', error);
+      throw error;
+    }
+    
+    return data as JournalEntry[];
+  },
+  
+  async getJournalEntryById(id: string): Promise<JournalEntry | null> {
+    const { data, error } = await supabase
+      .from('journal_entries')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching journal entry:', error);
+      throw error;
+    }
+    
+    return data as JournalEntry;
+  },
+  
+  async createJournalEntry(entry: NewJournalEntry): Promise<JournalEntry> {
+    // Get the current user ID
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+    
+    // Get the current date
+    const now = new Date();
+    const date = now.toISOString().split('T')[0];
+    
+    // Add the user_id and date to the entry object
+    const entryWithUserId = {
+      ...entry,
+      user_id: user.id,
+      date
+    };
+    
+    const { data, error } = await supabase
+      .from('journal_entries')
+      .insert([entryWithUserId])
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error creating journal entry:', error);
+      throw error;
+    }
+    
+    return data as JournalEntry;
+  },
+  
+  async updateJournalEntry(id: string, entry: Partial<JournalEntry>): Promise<JournalEntry> {
+    const { data, error } = await supabase
+      .from('journal_entries')
+      .update(entry)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error updating journal entry:', error);
+      throw error;
+    }
+    
+    return data as JournalEntry;
+  },
+  
+  async deleteJournalEntry(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('journal_entries')
+      .delete()
+      .eq('id', id);
+    
+    if (error) {
+      console.error('Error deleting journal entry:', error);
+      throw error;
+    }
+  },
 }; 

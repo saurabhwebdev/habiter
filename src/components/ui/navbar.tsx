@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { BarChart, Settings, LogOut, HelpCircle, ArrowLeft } from 'lucide-react';
+import { BarChart, Settings, LogOut, HelpCircle, ArrowLeft, Book } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 
 export const Navbar = () => {
@@ -34,6 +34,7 @@ export const Navbar = () => {
             {isMainDashboard ? 'Habiter' : 
               location.pathname === '/settings' ? 'Settings' : 
               location.pathname === '/statistics' ? 'Statistics' : 
+              location.pathname === '/journal' ? 'Journal' :
               location.pathname === '/help' ? 'Help' : 'Habiter'}
           </h1>
         </div>
@@ -45,6 +46,14 @@ export const Navbar = () => {
             className={`text-black/70 hover:text-black hover:bg-black/5 ${location.pathname === '/statistics' ? 'bg-black/10' : ''}`}
           >
             <BarChart className="h-5 w-5" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={() => navigate('/journal')}
+            className={`text-black/70 hover:text-black hover:bg-black/5 ${location.pathname === '/journal' ? 'bg-black/10' : ''}`}
+          >
+            <Book className="h-5 w-5" />
           </Button>
           <Button 
             variant="ghost" 

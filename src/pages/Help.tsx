@@ -26,7 +26,12 @@ import {
   AlertTriangle,
   Sparkles,
   RefreshCw,
-  DollarSign
+  DollarSign,
+  Book,
+  Pencil,
+  Filter,
+  ThumbsUp,
+  ThumbsDown
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -289,6 +294,48 @@ const Help = () => {
 
             <Card className="border-black/10 mb-6 overflow-hidden">
               <div className="bg-black/5 p-4 flex items-center gap-3">
+                <Book className="h-6 w-6 text-black/70" />
+                <div>
+                  <CardTitle>Journal</CardTitle>
+                  <CardDescription>Record your habit journey</CardDescription>
+                </div>
+              </div>
+              <CardContent className="pt-6">
+                <p className="text-black/70 mb-4">
+                  The Journal feature helps you reflect on your habits and track your emotional journey:
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><Pencil className="h-4 w-4" /></div>
+                    <span>Record detailed journal entries about your habits</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><ThumbsUp className="h-4 w-4" /></div>
+                    <span>For positive habits, track your motivations and celebrations</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><ThumbsDown className="h-4 w-4" /></div>
+                    <span>For negative habits, monitor triggers, cravings, and urge levels</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Track your mood alongside each habit entry</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><Filter className="h-4 w-4" /></div>
+                    <span>Filter and search your journal history to identify patterns</span>
+                  </li>
+                </ul>
+                <div className="mt-4 p-3 bg-black/5 rounded-md">
+                  <p className="text-sm">
+                    <strong>Pro Tip:</strong> Journaling about your habits can double their effectiveness by making you more conscious of your behaviors and triggers. Try to journal regularly, especially when you struggle with a habit.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-black/10 mb-6 overflow-hidden">
+              <div className="bg-black/5 p-4 flex items-center gap-3">
                 <PlusCircle className="h-6 w-6 text-black/70" />
                 <div>
                   <CardTitle>Adding & Editing Habits</CardTitle>
@@ -426,6 +473,12 @@ const Help = () => {
                     <div className="mt-1 text-black/70"><DollarSign className="h-5 w-5" /></div>
                     <div>
                       <strong>Track your savings:</strong> Use money tracking to see the financial benefits of breaking negative habits
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3 p-3 rounded-md bg-black/5">
+                    <div className="mt-1 text-black/70"><Book className="h-5 w-5" /></div>
+                    <div>
+                      <strong>Keep a journal:</strong> Record your thoughts and feelings about your habits to gain deeper insights and increase success
                     </div>
                   </li>
                 </ul>
