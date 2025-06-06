@@ -9,45 +9,59 @@ import {
 } from "@/components/ui/toast"
 import { useEffect, useState } from "react"
 
-// Custom component that shows a timer bar
-const ToastWithTimer = ({ children, duration = 3000, ...props }: any) => {
-  const [progress, setProgress] = useState(100)
+// Simple timer toast component
+const TimerToast = ({ children, id, ...props }: { 
+  children: React.ReactNode; 
+  id: string; 
+  [key: string]: any 
+}) => {
+  const [width, setWidth] = useState(100);
+  const { dismiss } = useToast();
+  const DURATION = 3000; // 3 seconds
   
   useEffect(() => {
-    const startTime = Date.now()
-    const endTime = startTime + duration
+    // Start with 100% width
+    setWidth(100);
     
-    const timer = setInterval(() => {
-      const now = Date.now()
-      const timeLeft = Math.max(0, endTime - now)
-      const percent = (timeLeft / duration) * 100
-      
-      setProgress(percent)
-      
-      if (now >= endTime) {
-        clearInterval(timer)
-      }
-    }, 10)
+    // Update every 30ms (smoother animation)
+    const intervalId = setInterval(() => {
+      setWidth((prevWidth) => {
+        // Decrease by about 3.33% each 100ms (to reach 0 in 3 seconds)
+        const newWidth = prevWidth - 1;
+        return newWidth > 0 ? newWidth : 0;
+      });
+    }, 30);
     
-    return () => clearInterval(timer)
-  }, [duration])
+    // Auto dismiss after duration
+    const timeoutId = setTimeout(() => {
+      if (id) dismiss(id);
+    }, DURATION);
+    
+    return () => {
+      clearInterval(intervalId);
+      clearTimeout(timeoutId);
+    };
+  }, [id, dismiss]);
   
   return (
     <Toast {...props}>
       {children}
-      <div className="absolute bottom-0 left-0 h-1 bg-primary" style={{ width: `${progress}%`, transition: 'width 10ms linear' }} />
+      <div 
+        className="absolute bottom-0 left-0 h-2 bg-primary transition-all duration-100 ease-linear"
+        style={{ width: `${width}%` }}
+      />
     </Toast>
-  )
-}
+  );
+};
 
 export function Toaster() {
-  const { toasts } = useToast()
+  const { toasts } = useToast();
 
   return (
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
-          <ToastWithTimer key={id} {...props}>
+          <TimerToast key={id} id={id} {...props}>
             <div className="grid gap-1">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && (
@@ -56,10 +70,10 @@ export function Toaster() {
             </div>
             {action}
             <ToastClose />
-          </ToastWithTimer>
-        )
+          </TimerToast>
+        );
       })}
       <ToastViewport />
     </ToastProvider>
-  )
+  );
 }
