@@ -1,282 +1,200 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { ArrowRight, Check, ChevronRight } from "lucide-react";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-white text-black">
-      {/* Header */}
-      <header className="border-b border-black/10 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight">Habiter</h1>
-          <div className="space-x-4">
+    <div className="min-h-screen bg-white">
+      {/* Minimal Header */}
+      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-black/5 py-4">
+        <div className="container px-4 mx-auto flex justify-between items-center">
+          <h1 className="text-2xl font-bold">HabitFlow</h1>
+          <div className="flex gap-2">
             <Link to="/login">
-              <Button variant="outline" className="border-black/20 hover:bg-black hover:text-white">
-                Sign In
+              <Button variant="ghost" size="sm" className="text-sm">
+                Log in
               </Button>
             </Link>
             <Link to="/signup">
-              <Button className="bg-black text-white hover:bg-black/90">
-                Sign Up
+              <Button size="sm" className="bg-black text-white hover:bg-black/80 text-sm">
+                Sign up
               </Button>
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center space-y-8">
-          <div className="space-y-4">
-            <h2 className="text-5xl font-light tracking-wide">
-              Build better habits, one tap at a time
-            </h2>
-            <p className="text-xl text-black/70 max-w-2xl mx-auto leading-relaxed">
-              Track, reduce bad habits, and build good ones with our simple, minimalist approach
-            </p>
-          </div>
+      {/* Hero Section - Simplified */}
+      <section className="container px-4 mx-auto py-10 md:py-16">
+        <div className="flex flex-col items-center text-center space-y-6 max-w-3xl mx-auto">
+          <Badge className="bg-black/10 text-black hover:bg-black/20 border-none">Track. Build. Improve.</Badge>
+          <h2 className="text-3xl md:text-5xl font-medium tracking-tight">
+            Better habits, <span className="text-black/50">better life</span>
+          </h2>
+          <p className="text-base text-black/70 max-w-md leading-relaxed">
+            Simple, minimal habit tracking to help you build good habits and break bad ones.
+          </p>
+          <Link to="/signup" className="w-full sm:w-auto">
+            <Button className="w-full sm:w-auto bg-black text-white hover:bg-black/80 mt-2 flex items-center gap-2">
+              Get started <ArrowRight size={16} />
+            </Button>
+          </Link>
+        </div>
+      </section>
 
-          <div className="pt-8">
-            <Link to="/signup">
-              <Button size="lg" className="bg-black text-white hover:bg-black/90 px-8">
-                Get Started
-              </Button>
-            </Link>
+      {/* Features Section - Mobile First */}
+      <section className="py-10 md:py-16 bg-black/5">
+        <div className="container px-4 mx-auto">
+          <div className="text-center mb-10">
+            <h3 className="text-xl md:text-2xl font-medium">How it works</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="border-none shadow-sm bg-white">
+              <CardHeader className="pb-2">
+                <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white mb-2">
+                  <span>1</span>
+                </div>
+                <CardTitle className="text-lg">Track daily</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-black/70">
+                Simple one-tap tracking for both positive and negative habits. Just tap to log your progress.
+              </CardContent>
+            </Card>
+            
+            <Card className="border-none shadow-sm bg-white">
+              <CardHeader className="pb-2">
+                <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white mb-2">
+                  <span>2</span>
+                </div>
+                <CardTitle className="text-lg">Build streaks</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-black/70">
+                Watch your streaks grow day by day. Stay motivated with visual progress indicators.
+              </CardContent>
+            </Card>
+            
+            <Card className="border-none shadow-sm bg-white">
+              <CardHeader className="pb-2">
+                <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white mb-2">
+                  <span>3</span>
+                </div>
+                <CardTitle className="text-lg">See insights</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-black/70">
+                Understand your patterns with simple analytics that help you improve over time.
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
-      {/* Feature Tabs */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <Tabs defaultValue="track" className="w-full">
-          <div className="flex justify-center mb-8">
-            <TabsList className="grid grid-cols-3 w-full max-w-2xl">
-              <TabsTrigger value="track">Tap-to-Track</TabsTrigger>
-              <TabsTrigger value="chr">CHR System</TabsTrigger>
-              <TabsTrigger value="streak">Streak Tracking</TabsTrigger>
-            </TabsList>
-          </div>
-          
-          <TabsContent value="track" className="space-y-4">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-medium mb-2">Effortless Habit Tracking</h3>
-              <p className="text-black/70 max-w-2xl mx-auto">
-                Track your habits with a single tap. Whether you're reducing cigarettes or increasing water intake, our simple interface makes logging effortless.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="border border-black/10">
-                <CardHeader>
-                  <Badge className="w-fit bg-black text-white hover:bg-black/90">Positive Habit</Badge>
-                  <CardTitle className="flex items-center gap-2">
-                    <span>💧</span> Drink Water
-                  </CardTitle>
-                  <CardDescription>Goal: Min 8 glasses daily</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-2xl font-medium">5/8</p>
-                      <p className="text-xs text-black/50">Today's progress</p>
-                    </div>
-                    <Button size="icon" className="h-10 w-10 rounded-full bg-black text-white hover:bg-black/90">+</Button>
+      {/* Sample Habits Section */}
+      <section className="container px-4 mx-auto py-10 md:py-16">
+        <div className="text-center mb-8">
+          <h3 className="text-xl md:text-2xl font-medium mb-2">Simple habit tracking</h3>
+          <p className="text-black/70 text-sm max-w-md mx-auto">
+            Track both good habits you want to build and bad habits you want to break
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+          <Card className="border border-black/5 shadow-sm">
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-none">Positive</Badge>
+                <span className="text-xl">💧</span>
+              </div>
+              <CardTitle className="text-base mt-2">Drink Water</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-lg font-medium">5/8</p>
+                  <div className="w-full bg-black/10 h-1.5 rounded-full mt-1.5 mb-1">
+                    <div className="bg-green-500 h-1.5 rounded-full" style={{ width: '62.5%' }}></div>
                   </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border border-black/10">
-                <CardHeader>
-                  <Badge className="w-fit bg-black text-white hover:bg-black/90">Negative Habit</Badge>
-                  <CardTitle className="flex items-center gap-2">
-                    <span>🚬</span> Smoking
-                  </CardTitle>
-                  <CardDescription>Goal: Max 5 cigarettes daily</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-2xl font-medium">3/5</p>
-                      <p className="text-xs text-black/50">Today's progress</p>
-                    </div>
-                    <Button size="icon" className="h-10 w-10 rounded-full bg-black text-white hover:bg-black/90">+</Button>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border border-black/10">
-                <CardHeader>
-                  <Badge className="w-fit bg-black text-white hover:bg-black/90">Positive Habit</Badge>
-                  <CardTitle className="flex items-center gap-2">
-                    <span>🚶</span> Walking
-                  </CardTitle>
-                  <CardDescription>Goal: Min 30 minutes daily</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-2xl font-medium">15/30</p>
-                      <p className="text-xs text-black/50">Today's progress</p>
-                    </div>
-                    <Button size="icon" className="h-10 w-10 rounded-full bg-black text-white hover:bg-black/90">+</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="chr" className="space-y-4">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-medium mb-2">Cue-Habit-Reward System</h3>
-              <p className="text-black/70 max-w-2xl mx-auto">
-                Understand the triggers behind your habits and the rewards they provide to create lasting behavior change.
-              </p>
-            </div>
-            
-            <Card className="border border-black/10 max-w-2xl mx-auto">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span>🚬</span> Smoking CHR Analysis
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div className="p-4 border border-black/10 rounded-md">
-                    <h4 className="text-sm font-medium uppercase tracking-wide text-black/70">Cue</h4>
-                    <p className="mt-2">Feeling stressed at work</p>
-                  </div>
-                  <div className="p-4 border border-black/10 rounded-md">
-                    <h4 className="text-sm font-medium uppercase tracking-wide text-black/70">Habit</h4>
-                    <p className="mt-2">Smoke a cigarette</p>
-                  </div>
-                  <div className="p-4 border border-black/10 rounded-md">
-                    <h4 className="text-sm font-medium uppercase tracking-wide text-black/70">Reward</h4>
-                    <p className="mt-2">Temporary relief from stress</p>
-                  </div>
+                  <p className="text-xs text-black/50">Today's progress</p>
                 </div>
-                <p className="text-sm text-black/70 mt-4">
-                  By understanding this pattern, you can develop alternative responses to the same cue that provide similar rewards.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                <Button size="sm" className="h-8 w-8 rounded-full bg-green-500 text-white hover:bg-green-600 p-0">+</Button>
+              </div>
+            </CardContent>
+          </Card>
           
-          <TabsContent value="streak" className="space-y-4">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-medium mb-2">Streak Tracking</h3>
-              <p className="text-black/70 max-w-2xl mx-auto">
-                Build momentum and stay motivated with visual streak tracking for each of your habits.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="border border-black/10">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span>💧</span> Water Intake
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <div className="mb-4">
-                    <span className="text-4xl font-light">🔥</span>
-                    <p className="text-3xl font-medium mt-2">7 Days</p>
-                    <p className="text-sm text-black/70">Current Streak</p>
+          <Card className="border border-black/5 shadow-sm">
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <Badge className="bg-red-100 text-red-700 hover:bg-red-200 border-none">Negative</Badge>
+                <span className="text-xl">🚬</span>
+              </div>
+              <CardTitle className="text-base mt-2">Smoking</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-lg font-medium">3/5</p>
+                  <div className="w-full bg-black/10 h-1.5 rounded-full mt-1.5 mb-1">
+                    <div className="bg-red-500 h-1.5 rounded-full" style={{ width: '60%' }}></div>
                   </div>
-                  <p className="text-xs text-black/50">Longest streak: 14 days</p>
-                </CardContent>
-              </Card>
-              
-              <Card className="border border-black/10">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span>🚬</span> Smoking Reduction
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <div className="mb-4">
-                    <span className="text-4xl font-light">🔥</span>
-                    <p className="text-3xl font-medium mt-2">5 Days</p>
-                    <p className="text-sm text-black/70">Current Streak</p>
-                  </div>
-                  <p className="text-xs text-black/50">Longest streak: 10 days</p>
-                </CardContent>
-              </Card>
-              
-              <Card className="border border-black/10">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span>🚶</span> Daily Walking
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <div className="mb-4">
-                    <span className="text-4xl font-light">🔥</span>
-                    <p className="text-3xl font-medium mt-2">3 Days</p>
-                    <p className="text-sm text-black/70">Current Streak</p>
-                  </div>
-                  <p className="text-xs text-black/50">Longest streak: 21 days</p>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+                  <p className="text-xs text-black/50">Today's progress</p>
+                </div>
+                <Button size="sm" className="h-8 w-8 rounded-full bg-red-500 text-white hover:bg-red-600 p-0">+</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </section>
 
-      {/* Features Overview */}
-      <section className="bg-black/5 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-2xl font-medium text-center mb-12">Key Features</h3>
+      {/* Testimonials/Benefits */}
+      <section className="bg-black text-white py-10 md:py-16">
+        <div className="container px-4 mx-auto">
+          <div className="text-center mb-8">
+            <h3 className="text-xl md:text-2xl font-medium">Why people love HabitFlow</h3>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center space-y-4">
-              <div className="w-12 h-12 mx-auto bg-black flex items-center justify-center text-white rounded-full">
-                <span className="text-xl">👆</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Check size={18} className="text-green-400" />
+                <p className="font-medium">Simple tracking</p>
               </div>
-              <h4 className="text-lg font-medium">Tap-to-Track</h4>
-              <p className="text-black/60">Log habits with a single tap for effortless tracking</p>
+              <p className="text-sm text-white/70 pl-6">No complicated features, just what you need</p>
             </div>
-
-            <div className="text-center space-y-4">
-              <div className="w-12 h-12 mx-auto bg-black flex items-center justify-center text-white rounded-full">
-                <span className="text-xl">🧠</span>
+            
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Check size={18} className="text-green-400" />
+                <p className="font-medium">Motivational insights</p>
               </div>
-              <h4 className="text-lg font-medium">CHR System</h4>
-              <p className="text-black/60">Understand the psychology behind your habits</p>
+              <p className="text-sm text-white/70 pl-6">Stay motivated with streaks and progress tracking</p>
             </div>
-
-            <div className="text-center space-y-4">
-              <div className="w-12 h-12 mx-auto bg-black flex items-center justify-center text-white rounded-full">
-                <span className="text-xl">🔥</span>
+            
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Check size={18} className="text-green-400" />
+                <p className="font-medium">Habit psychology</p>
               </div>
-              <h4 className="text-lg font-medium">Streaks</h4>
-              <p className="text-black/60">Build momentum with visual streak tracking</p>
-            </div>
-
-            <div className="text-center space-y-4">
-              <div className="w-12 h-12 mx-auto bg-black flex items-center justify-center text-white rounded-full">
-                <span className="text-xl">📊</span>
-              </div>
-              <h4 className="text-lg font-medium">Insights</h4>
-              <p className="text-black/60">Track progress with weekly and monthly trends</p>
+              <p className="text-sm text-white/70 pl-6">Built on proven behavioral science principles</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center space-y-6">
-          <h3 className="text-3xl font-light">Ready to transform your habits?</h3>
-          <p className="text-black/70 max-w-2xl mx-auto">
-            Join Habiter today and start building better habits, one day at a time.
+      <section className="container px-4 mx-auto py-10 md:py-16">
+        <div className="max-w-md mx-auto text-center space-y-4">
+          <h3 className="text-xl md:text-2xl font-medium">Ready to start?</h3>
+          <p className="text-sm text-black/70">
+            Join thousands of people building better habits with HabitFlow
           </p>
-          <div className="pt-4">
-            <Link to="/signup">
-              <Button size="lg" className="bg-black text-white hover:bg-black/90 px-8">
-                Start Your Journey
+          <div className="pt-2 flex justify-center">
+            <Link to="/signup" className="w-full sm:w-auto">
+              <Button className="w-full sm:w-auto bg-black text-white hover:bg-black/80">
+                Create free account
               </Button>
             </Link>
           </div>
@@ -284,12 +202,17 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-black/10 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
+      <footer className="border-t border-black/5 py-6">
+        <div className="container px-4 mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-black/50 text-sm">
-              © 2024 Habiter. Build better habits, one day at a time.
+              © 2024 HabitFlow
             </p>
+            <div className="flex gap-4 text-sm text-black/70">
+              <Link to="/privacy" className="hover:text-black">Privacy</Link>
+              <Link to="/terms" className="hover:text-black">Terms</Link>
+              <Link to="/help" className="hover:text-black">Help</Link>
+            </div>
           </div>
         </div>
       </footer>
