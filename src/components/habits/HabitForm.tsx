@@ -13,22 +13,32 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { habitService } from '@/lib/habitService';
 import { toast } from '@/components/ui/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 // Define the form schema with Zod
 const habitSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  name: z.string().min(2, 'Name must be at least 2 characters'),
   type: z.enum(['positive', 'negative']),
   icon: z.string().optional(),
   unit: z.string().min(1, 'Unit is required'),
   goal_type: z.enum(['min', 'max']),
-  daily_goal: z.coerce.number().positive('Goal must be positive'),
+  daily_goal: z.coerce.number().positive('Goal must be a positive number'),
   cue: z.string().optional(),
   habit: z.string().optional(),
   reward: z.string().optional(),
-  reminder_enabled: z.boolean().default(false),
+  reminder_enabled: z.boolean(),
   money_tracking_enabled: z.boolean().default(false),
   cost_per_unit: z.coerce.number().optional(),
   currency: z.string().default('USD'),
+  tapering_enabled: z.boolean().default(false),
+  tapering_start_date: z.string().optional(),
+  tapering_end_date: z.string().optional(),
+  tapering_start_value: z.coerce.number().optional(),
+  tapering_target_value: z.coerce.number().default(0)
 });
 
 type HabitFormValues = z.infer<typeof habitSchema>;
@@ -42,26 +52,39 @@ interface HabitFormProps {
 export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel }) => {
   const [isLoading, setIsLoading] = useState(false);
   const isEditing = !!habit;
-  const [showMoneyTracking, setShowMoneyTracking] = useState(habit?.money_tracking_enabled || false);
+  const [showMoneyTracking, setShowMoneyTracking] = useState(false);
+  const [showTapering, setShowTapering] = useState(false);
 
   // Initialize the form with default values or existing habit values
   const form = useForm<HabitFormValues>({
     resolver: zodResolver(habitSchema),
-    defaultValues: {
-      name: habit?.name || '',
-      type: habit?.type || 'positive',
-      icon: habit?.icon || '',
-      unit: habit?.unit || '',
-      goal_type: habit?.goal_type || 'min',
-      daily_goal: habit?.daily_goal || 1,
-      cue: habit?.cue || '',
-      habit: habit?.habit || '',
-      reward: habit?.reward || '',
-      reminder_enabled: habit?.reminder_enabled || false,
-      money_tracking_enabled: habit?.money_tracking_enabled || false,
-      cost_per_unit: habit?.cost_per_unit || 0,
-      currency: habit?.currency || 'USD',
-    },
+    defaultValues: habit
+      ? {
+          ...habit,
+          tapering_enabled: habit.tapering_enabled || false,
+          tapering_start_value: habit.tapering_start_value || habit.daily_goal,
+          tapering_target_value: habit.tapering_target_value || 0
+        }
+      : {
+          name: '',
+          type: 'positive',
+          icon: '',
+          unit: '',
+          goal_type: 'min',
+          daily_goal: 1,
+          cue: '',
+          habit: '',
+          reward: '',
+          reminder_enabled: false,
+          money_tracking_enabled: false,
+          cost_per_unit: undefined,
+          currency: 'USD',
+          tapering_enabled: false,
+          tapering_start_date: format(new Date(), 'yyyy-MM-dd'),
+          tapering_end_date: format(new Date(new Date().setDate(new Date().getDate() + 30)), 'yyyy-MM-dd'),
+          tapering_start_value: 1,
+          tapering_target_value: 0
+        }
   });
 
   // Watch for changes in the money tracking enabled field
@@ -73,6 +96,41 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel
     });
     return () => subscription.unsubscribe();
   }, [form.watch]);
+
+  // Watch for changes to money_tracking_enabled and type
+  const moneyTrackingEnabled = form.watch('money_tracking_enabled');
+  const habitType = form.watch('type');
+  const taperingEnabled = form.watch('tapering_enabled');
+  const goalType = form.watch('goal_type');
+  
+  // Show money tracking section only for negative habits with money tracking enabled
+  useEffect(() => {
+    setShowMoneyTracking(moneyTrackingEnabled && habitType === 'negative');
+  }, [moneyTrackingEnabled, habitType]);
+  
+  // Show tapering section only for negative habits with max goal type
+  useEffect(() => {
+    setShowTapering(taperingEnabled && habitType === 'negative' && goalType === 'max');
+    
+    // When tapering is enabled, set the start value to the daily goal if not already set
+    if (taperingEnabled && habitType === 'negative' && goalType === 'max') {
+      const currentDailyGoal = form.getValues('daily_goal');
+      const currentStartValue = form.getValues('tapering_start_value');
+      
+      if (!currentStartValue) {
+        form.setValue('tapering_start_value', currentDailyGoal);
+      }
+    }
+  }, [taperingEnabled, habitType, goalType, form]);
+  
+  // When habit type changes, update goal type
+  useEffect(() => {
+    if (habitType === 'positive') {
+      form.setValue('goal_type', 'min');
+    } else {
+      form.setValue('goal_type', 'max');
+    }
+  }, [habitType, form]);
 
   // Handle form submission
   const onSubmit = async (data: HabitFormValues) => {
@@ -477,6 +535,176 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel
               </FormItem>
             )}
           />
+
+          {/* Tapering Toggle (only for negative habits) */}
+          {habitType === 'negative' && goalType === 'max' && (
+            <FormField
+              control={form.control}
+              name="tapering_enabled"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border border-black/10 p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">Enable Goal Tapering</FormLabel>
+                    <FormDescription>
+                      Gradually reduce your goal over time to help you quit completely
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          )}
+          
+          {/* Tapering Settings (conditional) */}
+          {showTapering && (
+            <div className="space-y-4 border border-black/10 p-4 rounded-md">
+              <h3 className="font-medium">Tapering Schedule</h3>
+              <p className="text-sm text-black/70">
+                Set a schedule to gradually reduce your {form.watch('unit')} consumption
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Start Date */}
+                <FormField
+                  control={form.control}
+                  name="tapering_start_date"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Start Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal border-black/20 focus:border-black",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(new Date(field.value), "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value ? new Date(field.value) : undefined}
+                            onSelect={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : undefined)}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormDescription>
+                        When should tapering begin?
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* End Date */}
+                <FormField
+                  control={form.control}
+                  name="tapering_end_date"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Target Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal border-black/20 focus:border-black",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(new Date(field.value), "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value ? new Date(field.value) : undefined}
+                            onSelect={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : undefined)}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormDescription>
+                        When do you want to reach your target?
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Starting Value */}
+                <FormField
+                  control={form.control}
+                  name="tapering_start_value"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Starting Amount</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          min="1"
+                          {...field} 
+                          className="border-black/20 focus:border-black"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        How many {form.watch('unit')}s per day to start?
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Target Value */}
+                <FormField
+                  control={form.control}
+                  name="tapering_target_value"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Target Amount</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          min="0"
+                          {...field} 
+                          className="border-black/20 focus:border-black"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Goal amount (usually zero to quit)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          )}
         </div>
         
         {/* Form Actions */}

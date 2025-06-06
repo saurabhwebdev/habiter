@@ -391,20 +391,30 @@ export const habitService = {
         // Get streak
         const streak = await this.getStreak(habit.id);
         
+        // For negative habits with tapering enabled, get the current tapered goal
+        let effectiveGoal = habit.daily_goal;
+        if (habit.type === 'negative' && habit.tapering_enabled) {
+          try {
+            effectiveGoal = await this.getTaperedGoalValue(habit.id);
+          } catch (error) {
+            console.error('Error getting tapered goal value:', error);
+          }
+        }
+        
         // Calculate progress percentage
         let progressPercentage = 0;
         let goalMet = false;
         
         if (habit.goal_type === 'min') {
           // For min goals (like drink 8 glasses of water)
-          progressPercentage = Math.min(100, (total / habit.daily_goal) * 100);
-          goalMet = total >= habit.daily_goal;
+          progressPercentage = Math.min(100, (total / effectiveGoal) * 100);
+          goalMet = total >= effectiveGoal;
         } else {
           // For max goals (like smoke max 5 cigarettes)
-          progressPercentage = habit.daily_goal > 0 
-            ? Math.min(100, (total / habit.daily_goal) * 100)
+          progressPercentage = effectiveGoal > 0 
+            ? Math.min(100, (total / effectiveGoal) * 100)
             : (total > 0 ? 100 : 0);
-          goalMet = total <= habit.daily_goal;
+          goalMet = total <= effectiveGoal;
         }
         
         // Calculate money saved if money tracking is enabled
@@ -415,7 +425,7 @@ export const habitService = {
           // For negative habits, money is saved by not doing the habit
           if (habit.type === 'negative') {
             // Calculate how many units were avoided
-            const unitsAvoided = Math.max(0, habit.daily_goal - total);
+            const unitsAvoided = Math.max(0, effectiveGoal - total);
             moneySavedToday = unitsAvoided * habit.cost_per_unit;
             
             // Save today's money saving
@@ -449,12 +459,65 @@ export const habitService = {
           progress_percentage: progressPercentage,
           goal_met: goalMet,
           money_saved_today: moneySavedToday,
-          total_money_saved: totalMoneySaved
+          total_money_saved: totalMoneySaved,
+          daily_goal: effectiveGoal // Override daily_goal with tapered value if applicable
         };
       })
     );
     
     return habitsWithProgress;
+  },
+  
+  // Get the current tapered goal value for a habit
+  async getTaperedGoalValue(habitId: string): Promise<number> {
+    const { data, error } = await supabase
+      .rpc('calculate_tapered_goal_value', { p_habit_id: habitId });
+      
+    if (error) {
+      console.error('Error calculating tapered goal value:', error);
+      throw error;
+    }
+    
+    return data || 0;
+  },
+  
+  // Record a tapering history entry
+  async recordTaperingHistory(habitId: string, goalValue: number): Promise<void> {
+    // Get the current user ID
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+    
+    const { error } = await supabase
+      .from('tapering_history')
+      .insert([{
+        habit_id: habitId,
+        user_id: user.id,
+        goal_value: goalValue
+      }]);
+      
+    if (error) {
+      console.error('Error recording tapering history:', error);
+      throw error;
+    }
+  },
+  
+  // Get tapering history for a habit
+  async getTaperingHistory(habitId: string): Promise<any[]> {
+    const { data, error } = await supabase
+      .from('tapering_history')
+      .select('*')
+      .eq('habit_id', habitId)
+      .order('date', { ascending: true });
+      
+    if (error) {
+      console.error('Error getting tapering history:', error);
+      throw error;
+    }
+    
+    return data || [];
   },
   
   // Journal operations

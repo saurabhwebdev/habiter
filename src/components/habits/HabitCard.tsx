@@ -75,6 +75,16 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onUpdate }) => {
     }).format(amount);
   };
 
+  // Format date
+  const formatDate = (dateString?: string): string => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
   return (
     <>
       <Card className="border-black/10 hover:border-black/20 transition-colors">
@@ -134,6 +144,34 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onUpdate }) => {
               value={habit.progress_percentage} 
               className={`h-2 ${getProgressColor()}`} 
             />
+
+            {/* Tapering Display (if enabled) */}
+            {habit.tapering_enabled && habit.type === 'negative' && (
+              <div className="mt-3 pt-3 border-t border-black/10">
+                <div className="flex justify-between items-center">
+                  <p className="text-sm font-medium">Tapering Plan</p>
+                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                    Active
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs text-black/70 mt-1">
+                  <span>Start: {formatDate(habit.tapering_start_date)}</span>
+                  <span>Goal: {formatDate(habit.tapering_end_date)}</span>
+                </div>
+                <div className="flex justify-between text-xs text-black/70 mt-1">
+                  <span>Starting: {habit.tapering_start_value} {habit.unit}{habit.tapering_start_value !== 1 ? 's' : ''}</span>
+                  <span>Target: {habit.tapering_target_value} {habit.unit}{habit.tapering_target_value !== 1 ? 's' : ''}</span>
+                </div>
+                <div className="w-full h-1 bg-black/10 rounded-full mt-2">
+                  <div 
+                    className="h-1 bg-blue-600 rounded-full" 
+                    style={{ 
+                      width: `${calculateTaperingProgress()}%` 
+                    }}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Money Saved Display (if enabled) */}
             {habit.money_tracking_enabled && habit.type === 'negative' && (
@@ -279,4 +317,27 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onUpdate }) => {
       </Dialog>
     </>
   );
+
+  // Helper function to calculate tapering progress
+  function calculateTaperingProgress(): number {
+    if (!habit.tapering_enabled || !habit.tapering_start_date || !habit.tapering_end_date) {
+      return 0;
+    }
+    
+    const startDate = new Date(habit.tapering_start_date);
+    const endDate = new Date(habit.tapering_end_date);
+    const today = new Date();
+    
+    // If before start date
+    if (today < startDate) return 0;
+    
+    // If after end date
+    if (today > endDate) return 100;
+    
+    // Calculate percentage of time passed
+    const totalDays = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+    const daysPassed = (today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+    
+    return Math.round((daysPassed / totalDays) * 100);
+  }
 }; 

@@ -125,6 +125,7 @@ const Help = () => {
                       <div>
                         <p className="font-medium">Negative Habits</p>
                         <p className="text-sm text-black/70">Activities you want to do less of or avoid (e.g., smoking, excessive social media)</p>
+                        <p className="text-sm text-black/70 mt-1">For negative habits, you can enable <strong>tapering</strong> to gradually reduce your goal over time until you quit completely.</p>
                       </div>
                     </div>
                   </div>
@@ -148,15 +149,15 @@ const Help = () => {
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
-                      <span>For negative habits, reset the counter if you slip up</span>
+                      <span>For negative habits, track occurrences and stay below your daily limit</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                      <span>With tapering enabled, your daily limit for negative habits will automatically decrease over time</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
                       <span>Watch your streaks grow as you consistently maintain your habits</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
-                      <span>Set frequency goals (daily, weekly, etc.) to stay on track</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="mt-1 text-black/70"><DollarSign className="h-4 w-4" /></div>
@@ -287,6 +288,48 @@ const Help = () => {
                   <p className="text-sm">
                     <strong>Pro Tip:</strong> Use the money saved as motivation to continue your habit-breaking journey. 
                     Consider setting aside the saved money for a reward when you reach a milestone.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-black/10 mb-6 overflow-hidden">
+              <div className="bg-black/5 p-4 flex items-center gap-3">
+                <TrendingUp className="h-6 w-6 text-black/70" />
+                <div>
+                  <CardTitle>Goal Tapering</CardTitle>
+                  <CardDescription>Gradually reduce negative habits until you quit</CardDescription>
+                </div>
+              </div>
+              <CardContent className="pt-6">
+                <p className="text-black/70 mb-4">
+                  The tapering feature helps you gradually reduce negative habits over time:
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Enable tapering when creating or editing a negative habit</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Set a starting limit (e.g., maximum 5 cigarettes per day)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Choose a target date to reach your goal (typically zero)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>The system automatically calculates a gradually decreasing daily limit</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Track your tapering progress with a visual progress bar</span>
+                  </li>
+                </ul>
+                <div className="mt-4 p-3 bg-black/5 rounded-md">
+                  <p className="text-sm">
+                    <strong>Pro Tip:</strong> Tapering is often more effective than quitting "cold turkey" because it gives your body and mind time to adjust. It also provides a structured approach with clear milestones along the way.
                   </p>
                 </div>
               </CardContent>
@@ -473,6 +516,12 @@ const Help = () => {
                     <div className="mt-1 text-black/70"><DollarSign className="h-5 w-5" /></div>
                     <div>
                       <strong>Track your savings:</strong> Use money tracking to see the financial benefits of breaking negative habits
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3 p-3 rounded-md bg-black/5">
+                    <div className="mt-1 text-black/70"><TrendingUp className="h-5 w-5" /></div>
+                    <div>
+                      <strong>Use tapering for negative habits:</strong> Instead of quitting cold turkey, use the tapering feature to gradually reduce your limit until you quit completely
                     </div>
                   </li>
                   <li className="flex items-start gap-3 p-3 rounded-md bg-black/5">

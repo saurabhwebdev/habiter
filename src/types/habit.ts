@@ -17,6 +17,11 @@ export interface Habit {
   money_tracking_enabled?: boolean;
   cost_per_unit?: number;
   currency?: string;
+  tapering_enabled?: boolean;
+  tapering_start_date?: string;
+  tapering_end_date?: string;
+  tapering_start_value?: number;
+  tapering_target_value?: number;
   created_at: string;
   updated_at: string;
 }
@@ -78,6 +83,11 @@ export interface NewHabit {
   money_tracking_enabled?: boolean;
   cost_per_unit?: number;
   currency?: string;
+  tapering_enabled?: boolean;
+  tapering_start_date?: string;
+  tapering_end_date?: string;
+  tapering_start_value?: number;
+  tapering_target_value?: number;
 }
 
 export interface NewHabitLog {
