@@ -3,6 +3,25 @@ import { geminiService } from '@/lib/geminiService';
 import { Sparkles, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// Default messages array to avoid any API or Supabase calls
+const DEFAULT_MESSAGES = [
+  "Small daily actions compound into remarkable transformations.",
+  "Your habits shape your future. Choose wisely today.",
+  "Progress lives in the discomfort zone. Step in daily.",
+  "The gap between who you are and who you want to be is what you do daily.",
+  "Consistency, not intensity, is the path to lasting change.",
+  "Each tiny choice is a vote for the person you're becoming.",
+  "Success isn't owned, it's rented. The rent is due every day.",
+  "Master your habits, master your life.",
+  "The quality of your habits determines the quality of your future.",
+  "Break the cycle, build the routine, become the person you envision."
+];
+
+// Get a random message from the default array
+const getRandomMessage = () => {
+  return DEFAULT_MESSAGES[Math.floor(Math.random() * DEFAULT_MESSAGES.length)];
+};
+
 export const MotivationalMessage: React.FC = () => {
   const [message, setMessage] = useState<string>('');
   const [prevMessage, setPrevMessage] = useState<string>('');
@@ -17,6 +36,7 @@ export const MotivationalMessage: React.FC = () => {
   const fetchMessage = useCallback(async () => {
     try {
       setIsLoading(true);
+      
       // Start fade out transition of current message
       if (message) {
         setPrevMessage(message);
@@ -25,8 +45,11 @@ export const MotivationalMessage: React.FC = () => {
         await new Promise(resolve => setTimeout(resolve, 300));
       }
       
-      const motivationalMessage = await geminiService.getMotivationalMessage();
-      setMessage(motivationalMessage);
+      // Simply get a random message from our local array
+      // No API calls, no Supabase, just instant messages
+      const newMessage = getRandomMessage();
+      
+      setMessage(newMessage);
       setFadeState('in');
       
       // Reset timer to full interval
@@ -48,7 +71,13 @@ export const MotivationalMessage: React.FC = () => {
       }, 1000);
       
     } catch (error) {
-      console.error('Failed to fetch motivational message:', error);
+      console.error('Error displaying message:', error);
+      
+      // Just to be safe, set a default message
+      if (!message) {
+        setMessage(getRandomMessage());
+        setFadeState('in');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -115,6 +144,7 @@ export const MotivationalMessage: React.FC = () => {
               <button 
                 onClick={() => fetchMessage()} 
                 className="text-xs text-black/60 hover:text-black transition-colors"
+                disabled={isLoading}
               >
                 Refresh
               </button>
