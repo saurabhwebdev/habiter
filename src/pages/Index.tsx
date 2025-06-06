@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Check, ChevronRight } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, Heart } from "lucide-react";
 
 const Index = () => {
   return (
@@ -12,7 +12,7 @@ const Index = () => {
       {/* Minimal Header */}
       <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-black/5 py-4">
         <div className="container px-4 mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Habiter</h1>
+          <img src="/habiterlogo.svg" alt="Habiter Logo" height={32} style={{ height: 32, width: 'auto', display: 'inline', verticalAlign: 'middle' }} />
           <div className="flex gap-2">
             <Link to="/login">
               <Button variant="ghost" size="sm" className="text-sm">
@@ -153,7 +153,7 @@ const Index = () => {
       <section className="bg-black text-white py-10 md:py-16">
         <div className="container px-4 mx-auto">
           <div className="text-center mb-8">
-            <h3 className="text-xl md:text-2xl font-medium">Why people love HabitFlow</h3>
+            <h3 className="text-xl md:text-2xl font-medium">Why people love Habiter</h3>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -189,7 +189,7 @@ const Index = () => {
         <div className="max-w-md mx-auto text-center space-y-4">
           <h3 className="text-xl md:text-2xl font-medium">Ready to start?</h3>
           <p className="text-sm text-black/70">
-            Join thousands of people building better habits with HabitFlow
+            Join thousands of people building better habits with Habiter
           </p>
           <div className="pt-2 flex justify-center">
             <Link to="/signup" className="w-full sm:w-auto">
@@ -206,7 +206,7 @@ const Index = () => {
         <div className="container px-4 mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-black/50 text-sm">
-              © 2024 HabitFlow
+              © 2024 Habiter
             </p>
             <div className="flex gap-4 text-sm text-black/70">
               <Link to="/privacy" className="hover:text-black">Privacy</Link>

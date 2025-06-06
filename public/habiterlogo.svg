@@ -1,0 +1,18 @@
+<svg width="180" height="40" viewBox="0 0 180 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%">
+        <animate attributeName="stop-color" values="#ef4444;#22c55e;#3b82f6;#a21caf;#ef4444" dur="4s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="50%">
+        <animate attributeName="stop-color" values="#22c55e;#3b82f6;#a21caf;#ef4444;#22c55e" dur="4s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%">
+        <animate attributeName="stop-color" values="#3b82f6;#a21caf;#ef4444;#22c55e;#3b82f6" dur="4s" repeatCount="indefinite"/>
+      </stop>
+    </linearGradient>
+  </defs>
+  <text x="0" y="28" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="bold" fill="#222">
+    Ha<tspan fill="url(#bGradient)">B</tspan>iter
+  </text>
+</svg>
