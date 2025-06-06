@@ -7,7 +7,9 @@ import {
   NewHabitLog, 
   HabitWithProgress,
   HabitFilters,
-  DateRange
+  DateRange,
+  MoneySaving,
+  NewMoneySaving
 } from '@/types/habit';
 
 export const habitService = {
@@ -256,6 +258,117 @@ export const habitService = {
     }
   },
   
+  // Money Savings operations
+  async getMoneySavings(habitId: string, dateRange?: DateRange): Promise<MoneySaving[]> {
+    let query = supabase
+      .from('money_savings')
+      .select('*')
+      .eq('habit_id', habitId);
+    
+    if (dateRange) {
+      query = query
+        .gte('date', dateRange.start)
+        .lte('date', dateRange.end);
+    }
+    
+    query = query.order('date', { ascending: false });
+    
+    const { data, error } = await query;
+    
+    if (error) {
+      console.error('Error fetching money savings:', error);
+      throw error;
+    }
+    
+    return data as MoneySaving[];
+  },
+  
+  async getMoneySavingForDate(habitId: string, date: string): Promise<MoneySaving | null> {
+    const { data, error } = await supabase
+      .from('money_savings')
+      .select('*')
+      .eq('habit_id', habitId)
+      .eq('date', date)
+      .single();
+    
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No money saving found for this date
+        return null;
+      }
+      console.error('Error fetching money saving for date:', error);
+      throw error;
+    }
+    
+    return data as MoneySaving;
+  },
+  
+  async createOrUpdateMoneySaving(saving: NewMoneySaving): Promise<MoneySaving> {
+    // Get the current user ID
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+    
+    // Get the current date
+    const date = new Date().toISOString().split('T')[0];
+    
+    // Check if there's already a record for this habit and date
+    const existingSaving = await this.getMoneySavingForDate(saving.habit_id, date);
+    
+    if (existingSaving) {
+      // Update existing record
+      const { data, error } = await supabase
+        .from('money_savings')
+        .update({ amount_saved: saving.amount_saved })
+        .eq('id', existingSaving.id)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error updating money saving:', error);
+        throw error;
+      }
+      
+      return data as MoneySaving;
+    } else {
+      // Create new record
+      const savingWithUserIdAndDate = {
+        ...saving,
+        user_id: user.id,
+        date: date
+      };
+      
+      const { data, error } = await supabase
+        .from('money_savings')
+        .insert([savingWithUserIdAndDate])
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error creating money saving:', error);
+        throw error;
+      }
+      
+      return data as MoneySaving;
+    }
+  },
+  
+  async getTotalMoneySaved(habitId: string): Promise<number> {
+    const { data, error } = await supabase
+      .from('money_savings')
+      .select('amount_saved')
+      .eq('habit_id', habitId);
+    
+    if (error) {
+      console.error('Error fetching total money saved:', error);
+      throw error;
+    }
+    
+    return data.reduce((total, saving) => total + saving.amount_saved, 0);
+  },
+  
   // Get habits with today's progress
   async getHabitsWithProgress(): Promise<HabitWithProgress[]> {
     const today = new Date().toISOString().split('T')[0];
@@ -291,6 +404,38 @@ export const habitService = {
           goalMet = total <= habit.daily_goal;
         }
         
+        // Calculate money saved if money tracking is enabled
+        let moneySavedToday = 0;
+        let totalMoneySaved = 0;
+        
+        if (habit.money_tracking_enabled && habit.cost_per_unit) {
+          // For negative habits, money is saved by not doing the habit
+          if (habit.type === 'negative') {
+            // Calculate how many units were avoided
+            const unitsAvoided = Math.max(0, habit.daily_goal - total);
+            moneySavedToday = unitsAvoided * habit.cost_per_unit;
+            
+            // Save today's money saving
+            if (moneySavedToday > 0) {
+              try {
+                await this.createOrUpdateMoneySaving({
+                  habit_id: habit.id,
+                  amount_saved: moneySavedToday
+                });
+              } catch (error) {
+                console.error('Error saving money saving:', error);
+              }
+            }
+          }
+          
+          // Get total money saved for this habit
+          try {
+            totalMoneySaved = await this.getTotalMoneySaved(habit.id);
+          } catch (error) {
+            console.error('Error getting total money saved:', error);
+          }
+        }
+        
         return {
           ...habit,
           logs_today: logs,
@@ -299,7 +444,9 @@ export const habitService = {
           current_streak: streak?.current_streak || 0,
           longest_streak: streak?.longest_streak || 0,
           progress_percentage: progressPercentage,
-          goal_met: goalMet
+          goal_met: goalMet,
+          money_saved_today: moneySavedToday,
+          total_money_saved: totalMoneySaved
         };
       })
     );

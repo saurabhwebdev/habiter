@@ -1,6 +1,6 @@
 import React from 'react';
 import { HabitWithProgress } from '@/types/habit';
-import { CheckCircle2, AlertCircle, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { CheckCircle2, AlertCircle, ArrowUpCircle, ArrowDownCircle, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +21,9 @@ export const HabitTable: React.FC<HabitTableProps> = ({ habits, onUpdate }) => {
       </div>
     );
   }
+
+  // Check if any habits have money tracking enabled
+  const hasMoneyTracking = habits.some(habit => habit.money_tracking_enabled);
 
   const handleIncrement = async (habit: HabitWithProgress) => {
     try {
@@ -88,6 +91,16 @@ export const HabitTable: React.FC<HabitTableProps> = ({ habits, onUpdate }) => {
       : "bg-red-600 text-white hover:bg-red-700";
   };
 
+  // Format currency based on currency code
+  const formatCurrency = (amount: number, currency: string = 'USD'): string => {
+    return new Intl.NumberFormat('en-US', { 
+      style: 'currency', 
+      currency: currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
+  };
+
   return (
     <div className="border border-black/10 rounded-md overflow-x-auto">
       <Table>
@@ -98,6 +111,7 @@ export const HabitTable: React.FC<HabitTableProps> = ({ habits, onUpdate }) => {
             <TableHead>Goal</TableHead>
             <TableHead>Progress</TableHead>
             <TableHead>Streak</TableHead>
+            {hasMoneyTracking && <TableHead>Money Saved</TableHead>}
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -141,6 +155,25 @@ export const HabitTable: React.FC<HabitTableProps> = ({ habits, onUpdate }) => {
                 <TableCell>
                   {habit.current_streak} day{habit.current_streak !== 1 ? 's' : ''}
                 </TableCell>
+                {hasMoneyTracking && (
+                  <TableCell>
+                    {habit.money_tracking_enabled && habit.type === 'negative' ? (
+                      <div className="flex flex-col">
+                        <div className="flex items-center text-blue-600">
+                          <DollarSign className="h-3 w-3 mr-1" />
+                          <span className="font-medium">
+                            {formatCurrency(habit.total_money_saved || 0, habit.currency)}
+                          </span>
+                        </div>
+                        <span className="text-xs text-black/50">
+                          Today: {formatCurrency(habit.money_saved_today || 0, habit.currency)}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-black/30">-</span>
+                    )}
+                  </TableCell>
+                )}
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Button 

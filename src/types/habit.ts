@@ -14,6 +14,9 @@ export interface Habit {
   habit?: string;
   reward?: string;
   reminder_enabled: boolean;
+  money_tracking_enabled?: boolean;
+  cost_per_unit?: number;
+  currency?: string;
   created_at: string;
   updated_at: string;
 }
@@ -26,6 +29,15 @@ export interface HabitLog {
   time: string;
   count: number;
   note?: string;
+  created_at: string;
+}
+
+export interface MoneySaving {
+  id: string;
+  habit_id: string;
+  user_id: string;
+  date: string;
+  amount_saved: number;
   created_at: string;
 }
 
@@ -48,6 +60,8 @@ export interface HabitWithProgress extends Habit {
   longest_streak?: number;
   progress_percentage: number;
   goal_met: boolean;
+  money_saved_today?: number;
+  total_money_saved?: number;
 }
 
 export interface NewHabit {
@@ -61,12 +75,20 @@ export interface NewHabit {
   habit?: string;
   reward?: string;
   reminder_enabled: boolean;
+  money_tracking_enabled?: boolean;
+  cost_per_unit?: number;
+  currency?: string;
 }
 
 export interface NewHabitLog {
   habit_id: string;
   count: number;
   note?: string;
+}
+
+export interface NewMoneySaving {
+  habit_id: string;
+  amount_saved: number;
 }
 
 export interface HabitFilters {

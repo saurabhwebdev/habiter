@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { habitService } from '@/lib/habitService';
 import { toast } from '@/components/ui/use-toast';
-import { Pencil, Info, Edit } from 'lucide-react';
+import { Pencil, Info, Edit, DollarSign } from 'lucide-react';
 import { HabitDialog } from './HabitDialog';
 
 interface HabitCardProps {
@@ -63,6 +63,16 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onUpdate }) => {
       return 'border-green-600/30 bg-green-50 text-green-700';
     }
     return 'border-red-600/30 bg-red-50 text-red-700';
+  };
+
+  // Format currency based on currency code
+  const formatCurrency = (amount: number, currency: string = 'USD'): string => {
+    return new Intl.NumberFormat('en-US', { 
+      style: 'currency', 
+      currency: currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
   };
 
   return (
@@ -124,6 +134,30 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onUpdate }) => {
               value={habit.progress_percentage} 
               className={`h-2 ${getProgressColor()}`} 
             />
+
+            {/* Money Saved Display (if enabled) */}
+            {habit.money_tracking_enabled && habit.type === 'negative' && (
+              <div className="mt-3 pt-3 border-t border-black/10">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-1">
+                    <DollarSign className="h-4 w-4 text-blue-600" />
+                    <p className="text-sm font-medium text-blue-600">Money Saved:</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-blue-600">
+                      {formatCurrency(habit.money_saved_today || 0, habit.currency)}
+                    </p>
+                    <p className="text-xs text-black/50">Today</p>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center mt-1">
+                  <p className="text-xs text-black/50">Total saved:</p>
+                  <p className="text-xs font-medium">
+                    {formatCurrency(habit.total_money_saved || 0, habit.currency)}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
         

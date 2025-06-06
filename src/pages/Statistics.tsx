@@ -55,6 +55,16 @@ const BarChart = ({ data }: { data: { label: string; value: number; color: strin
   );
 };
 
+// Format currency based on currency code
+const formatCurrency = (amount: number, currency: string = 'USD'): string => {
+  return new Intl.NumberFormat('en-US', { 
+    style: 'currency', 
+    currency: currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(amount);
+};
+
 const Statistics = () => {
   const [habits, setHabits] = useState<HabitWithProgress[]>([]);
   const [habitLogs, setHabitLogs] = useState<HabitLog[]>([]);
@@ -125,6 +135,28 @@ const Statistics = () => {
     value: habit.current_streak || 0,
     color: habit.type === 'positive' ? '#22c55e' : '#ef4444'  // Green for positive, red for negative
   }));
+
+  // Calculate total money saved from all habits
+  const totalMoneySaved = habits.reduce((total, habit) => {
+    return total + (habit.total_money_saved || 0);
+  }, 0);
+  
+  // Find the habit with the most money saved
+  const habitWithMostSaved = habits
+    .filter(h => h.money_tracking_enabled && (h.total_money_saved || 0) > 0)
+    .sort((a, b) => (b.total_money_saved || 0) - (a.total_money_saved || 0))[0];
+  
+  // Get the primary currency used (from the habit with most saved)
+  const primaryCurrency = habitWithMostSaved?.currency || 'USD';
+  
+  // Create money savings data for chart
+  const moneySavingsData = habits
+    .filter(h => h.money_tracking_enabled && (h.total_money_saved || 0) > 0)
+    .map(habit => ({
+      label: habit.name.length > 10 ? habit.name.substring(0, 10) + '...' : habit.name,
+      value: Math.round((habit.total_money_saved || 0) * 100) / 100, // Round to 2 decimal places
+      color: '#3b82f6' // Blue color for money savings
+    }));
 
   // Generate data based on time range using actual logs
   const getTimeRangeData = () => {
@@ -318,6 +350,23 @@ const Statistics = () => {
             </Card>
           </div>
           
+          {/* Money Saved Card (if applicable) */}
+          {totalMoneySaved > 0 && (
+            <Card className="border-black/10 bg-blue-50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-black/70">Total Money Saved</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-blue-600">
+                  {formatCurrency(totalMoneySaved, primaryCurrency)}
+                </div>
+                <p className="text-xs text-black/70 mt-1">
+                  {habitWithMostSaved ? `Most saved from: ${habitWithMostSaved.name}` : 'From all tracked habits'}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+          
           {/* Streak Chart */}
           <div>
             <h2 className="text-xl font-medium mb-4">Current Streaks</h2>
@@ -331,6 +380,21 @@ const Statistics = () => {
               </div>
             )}
           </div>
+          
+          {/* Money Savings Chart (if applicable) */}
+          {moneySavingsData.length > 0 && (
+            <div>
+              <h2 className="text-xl font-medium mb-4">Money Saved by Habit</h2>
+              {isLoading ? (
+                <div className="h-64 animate-pulse bg-black/5 rounded-md"></div>
+              ) : (
+                <BarChart data={moneySavingsData} />
+              )}
+              <p className="text-xs text-center text-black/50 mt-2">
+                Total money saved per habit ({primaryCurrency})
+              </p>
+            </div>
+          )}
           
           {/* Time-based Activity */}
           <div>
