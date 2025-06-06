@@ -19,9 +19,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { supabase } from '@/lib/supabase';
 
 const Settings = () => {
-  const { user, updateEmail, updatePassword } = useAuth();
+  const { user, updateEmail, updatePassword, signOut } = useAuth();
   
   const [email, setEmail] = useState(user?.email || '');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -33,6 +34,9 @@ const Settings = () => {
   const [isLoadingHabits, setIsLoadingHabits] = useState(true);
   const [habitToDelete, setHabitToDelete] = useState<Habit | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteAccountDialog, setShowDeleteAccountDialog] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   // Fetch habits on component mount
   useEffect(() => {
@@ -145,6 +149,62 @@ const Settings = () => {
       });
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'DELETE') {
+      toast({
+        title: "Error",
+        description: "Please type DELETE to confirm",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      setIsDeletingAccount(true);
+      
+      // Delete all user data first
+      await Promise.all([
+        // Delete habits (which will cascade to logs, streaks, etc.)
+        ...habits.map(habit => habitService.deleteHabit(habit.id)),
+        
+        // Delete user from the database (if you have a profiles table)
+        supabase.from('profiles').delete().eq('id', user?.id)
+      ]);
+      
+      // Using the client API to delete the user account
+      const { error } = await supabase.auth.updateUser({
+        data: { deleted: true, deleted_at: new Date().toISOString() }
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Sign out
+      await signOut();
+      
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been permanently deleted.",
+      });
+      
+      // Redirect to home page
+      window.location.href = '/';
+      
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete account. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeletingAccount(false);
+      setShowDeleteAccountDialog(false);
     }
   };
 
@@ -332,6 +392,7 @@ const Settings = () => {
                 <Button 
                   variant="outline"
                   className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
+                  onClick={() => setShowDeleteAccountDialog(true)}
                 >
                   Delete Account
                 </Button>
@@ -362,6 +423,43 @@ const Settings = () => {
               disabled={isDeleting}
             >
               {isDeleting ? "Deleting..." : "Delete Habit"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      
+      {/* Delete Account Confirmation Dialog */}
+      <AlertDialog open={showDeleteAccountDialog} onOpenChange={setShowDeleteAccountDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+              Delete Account
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              <p className="mb-4">
+                Are you sure you want to delete your account? This action <strong>cannot be undone</strong>.
+                All your data, including habits, logs, and streaks will be permanently deleted.
+              </p>
+              <div className="bg-red-50 p-3 rounded-md text-red-800 mb-4">
+                <p className="text-sm font-medium">To confirm, type "DELETE" in the field below:</p>
+              </div>
+              <Input
+                className="border-red-300 focus:border-red-500"
+                placeholder="Type DELETE to confirm"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+              />
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-black/20">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAccount}
+              className="bg-red-600 text-white hover:bg-red-700"
+              disabled={isDeletingAccount || deleteConfirmText !== 'DELETE'}
+            >
+              {isDeletingAccount ? "Deleting..." : "Delete Account"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
