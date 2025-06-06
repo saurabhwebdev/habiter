@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/components/ui/use-toast';
-import { Save, Trash2, AlertTriangle } from 'lucide-react';
+import { Save, Trash2, AlertTriangle, InfoIcon } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { habitService } from '@/lib/habitService';
 import { Habit } from '@/types/habit';
@@ -302,8 +302,12 @@ const Settings = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-black/70">
-                  Notification preferences will be available in a future update.
+                  Push notification preferences will be available in a future update. Stay tuned!
                 </p>
+                <div className="mt-4 flex items-center space-x-2 bg-blue-50 text-blue-800 p-3 rounded-md">
+                  <InfoIcon className="h-4 w-4" />
+                  <p className="text-sm">We're working on bringing you timely reminders for your habits.</p>
+                </div>
               </CardContent>
             </Card>
           </div>

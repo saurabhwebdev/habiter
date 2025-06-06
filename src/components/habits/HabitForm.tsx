@@ -18,6 +18,7 @@ import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 // Define the form schema with Zod
 const habitSchema = z.object({
@@ -524,12 +525,14 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel
                   <FormLabel className="text-base">Enable Reminders</FormLabel>
                   <FormDescription>
                     Receive notifications for this habit
+                    <Badge variant="outline" className="ml-2 text-xs">Coming soon</Badge>
                   </FormDescription>
                 </div>
                 <FormControl>
                   <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
+                    checked={false}
+                    onCheckedChange={() => {}}
+                    disabled={true}
                   />
                 </FormControl>
               </FormItem>
