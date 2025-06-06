@@ -318,7 +318,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel
                 <div className="space-y-0.5">
                   <FormLabel className="text-base">Enable Money Tracking</FormLabel>
                   <FormDescription>
-                    Track money saved by reducing negative habits
+                    Track money saved by reducing negative habits (e.g., smoking, coffee, etc.)
                   </FormDescription>
                 </div>
                 <FormControl>

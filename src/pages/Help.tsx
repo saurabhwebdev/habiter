@@ -25,7 +25,8 @@ import {
   Heart,
   AlertTriangle,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  DollarSign
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -152,6 +153,10 @@ const Help = () => {
                       <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
                       <span>Set frequency goals (daily, weekly, etc.) to stay on track</span>
                     </li>
+                    <li className="flex items-start gap-2">
+                      <div className="mt-1 text-black/70"><DollarSign className="h-4 w-4" /></div>
+                      <span>Track money saved by reducing negative habits like smoking</span>
+                    </li>
                   </ul>
                 </AccordionContent>
               </AccordionItem>
@@ -231,7 +236,54 @@ const Help = () => {
                     <div className="mt-1 text-black/70"><BarChart className="h-4 w-4" /></div>
                     <span>Identify patterns and trends in your habit performance</span>
                   </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><DollarSign className="h-4 w-4" /></div>
+                    <span>View total money saved from reducing negative habits</span>
+                  </li>
                 </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="border-black/10 mb-6 overflow-hidden">
+              <div className="bg-black/5 p-4 flex items-center gap-3">
+                <DollarSign className="h-6 w-6 text-black/70" />
+                <div>
+                  <CardTitle>Money Tracking</CardTitle>
+                  <CardDescription>Save money by breaking negative habits</CardDescription>
+                </div>
+              </div>
+              <CardContent className="pt-6">
+                <p className="text-black/70 mb-4">
+                  Track the financial benefits of breaking negative habits:
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Enable money tracking when creating or editing a negative habit</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Set the cost per unit (e.g., cost per cigarette or alcoholic drink)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Choose your preferred currency</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>See daily and total money saved on your habit cards</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>View money saved charts on the Statistics page</span>
+                  </li>
+                </ul>
+                <div className="mt-4 p-3 bg-black/5 rounded-md">
+                  <p className="text-sm">
+                    <strong>Pro Tip:</strong> Use the money saved as motivation to continue your habit-breaking journey. 
+                    Consider setting aside the saved money for a reward when you reach a milestone.
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
@@ -343,25 +395,19 @@ const Help = () => {
                   <li className="flex items-start gap-3 p-3 rounded-md bg-black/5">
                     <div className="mt-1 text-black/70"><CheckCircle2 className="h-5 w-5" /></div>
                     <div>
-                      <strong>Start small:</strong> Begin with just 1-3 habits to avoid feeling overwhelmed
+                      <strong>Start small:</strong> Begin with 1-3 habits to avoid overwhelming yourself
                     </div>
                   </li>
                   <li className="flex items-start gap-3 p-3 rounded-md bg-black/5">
                     <div className="mt-1 text-black/70"><Clock className="h-5 w-5" /></div>
                     <div>
-                      <strong>Be consistent:</strong> Check in daily to track your progress
+                      <strong>Be consistent:</strong> Log your habits at the same time each day
                     </div>
                   </li>
                   <li className="flex items-start gap-3 p-3 rounded-md bg-black/5">
-                    <div className="mt-1 text-black/70"><TrendingUp className="h-5 w-5" /></div>
+                    <div className="mt-1 text-black/70"><AlertTriangle className="h-5 w-5" /></div>
                     <div>
-                      <strong>Don't break the chain:</strong> Try to maintain your streaks for motivation
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-3 p-3 rounded-md bg-black/5">
-                    <div className="mt-1 text-black/70"><BarChart className="h-5 w-5" /></div>
-                    <div>
-                      <strong>Review your statistics:</strong> Use the data to identify patterns and make adjustments
+                      <strong>Don't break the chain:</strong> Try to maintain your streaks, but don't be discouraged by occasional slips
                     </div>
                   </li>
                   <li className="flex items-start gap-3 p-3 rounded-md bg-black/5">
@@ -374,6 +420,12 @@ const Help = () => {
                     <div className="mt-1 text-black/70"><Sparkles className="h-5 w-5" /></div>
                     <div>
                       <strong>Find inspiration:</strong> Pay attention to the motivational messages and apply their wisdom to your habit journey
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3 p-3 rounded-md bg-black/5">
+                    <div className="mt-1 text-black/70"><DollarSign className="h-5 w-5" /></div>
+                    <div>
+                      <strong>Track your savings:</strong> Use money tracking to see the financial benefits of breaking negative habits
                     </div>
                   </li>
                 </ul>
