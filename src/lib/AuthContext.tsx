@@ -46,8 +46,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     session,
     loading,
-    signIn: (email: string, password: string) => 
-      supabase.auth.signInWithPassword({ email, password }),
+    signIn: async (email: string, password: string) => {
+      // Check if the user account is marked as deleted
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (data?.user?.user_metadata?.deleted) {
+        // If the user is marked as deleted, sign them out and throw an error
+        await supabase.auth.signOut();
+        throw new Error('This account has been deleted');
+      }
+      
+      return { data, error };
+    },
     signUp: (email: string, password: string) => 
       supabase.auth.signUp({ email, password }),
     signOut: () => supabase.auth.signOut(),

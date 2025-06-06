@@ -165,25 +165,34 @@ const Settings = () => {
     try {
       setIsDeletingAccount(true);
       
-      // Delete all user data first
-      await Promise.all([
-        // Delete habits (which will cascade to logs, streaks, etc.)
-        ...habits.map(habit => habitService.deleteHabit(habit.id)),
-        
-        // Delete user from the database (if you have a profiles table)
-        supabase.from('profiles').delete().eq('id', user?.id)
-      ]);
+      // First delete habits (which will cascade to logs, streaks, etc.)
+      await Promise.all(habits.map(habit => habitService.deleteHabit(habit.id)));
       
-      // Using the client API to delete the user account
-      const { error } = await supabase.auth.updateUser({
-        data: { deleted: true, deleted_at: new Date().toISOString() }
-      });
-      
-      if (error) {
-        throw error;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!user || !user.id) {
+        throw new Error('You must be logged in to delete your account');
       }
       
-      // Sign out
+      // Call our Edge Function to properly delete the user account
+      const response = await fetch('https://yfhfjeknlapdbzrvlfre.supabase.co/functions/v1/delete-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmaGZqZWtubGFwZGJ6cnZsZnJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkxOTA5NjQsImV4cCI6MjA2NDc2Njk2NH0.jCbYeYOlQk6FN0xsyogMUi-SXSZRAlkO9UiqNcQDoXI'}`
+        },
+        body: JSON.stringify({
+          userId: user.id
+        }),
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        console.error('Delete account error details:', result);
+        throw new Error(result.error || 'Failed to delete account');
+      }
+      
+      // Sign out locally
       await signOut();
       
       toast({
