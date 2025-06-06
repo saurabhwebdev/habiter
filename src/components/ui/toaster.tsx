@@ -7,7 +7,28 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
+
+// Define keyframes for the animation in a style tag that will be added to the head
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.innerHTML = `
+    @keyframes shrinkWidth {
+      0% { width: 100%; }
+      100% { width: 0%; }
+    }
+    .toast-progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      background-color: hsl(var(--primary));
+      animation: shrinkWidth 3000ms linear forwards;
+      width: 100%;
+    }
+  `;
+  document.head.appendChild(style);
+}
 
 // Simple timer toast component
 const TimerToast = ({ children, id, ...props }: { 
@@ -15,30 +36,16 @@ const TimerToast = ({ children, id, ...props }: {
   id: string; 
   [key: string]: any 
 }) => {
-  const [width, setWidth] = useState(100);
   const { dismiss } = useToast();
   const DURATION = 3000; // 3 seconds
   
   useEffect(() => {
-    // Start with 100% width
-    setWidth(100);
-    
-    // Update every 30ms (smoother animation)
-    const intervalId = setInterval(() => {
-      setWidth((prevWidth) => {
-        // Decrease by about 3.33% each 100ms (to reach 0 in 3 seconds)
-        const newWidth = prevWidth - 1;
-        return newWidth > 0 ? newWidth : 0;
-      });
-    }, 30);
-    
     // Auto dismiss after duration
     const timeoutId = setTimeout(() => {
       if (id) dismiss(id);
     }, DURATION);
     
     return () => {
-      clearInterval(intervalId);
       clearTimeout(timeoutId);
     };
   }, [id, dismiss]);
@@ -46,10 +53,7 @@ const TimerToast = ({ children, id, ...props }: {
   return (
     <Toast {...props}>
       {children}
-      <div 
-        className="absolute bottom-0 left-0 h-2 bg-primary transition-all duration-100 ease-linear"
-        style={{ width: `${width}%` }}
-      />
+      <div className="toast-progress-bar" />
     </Toast>
   );
 };
