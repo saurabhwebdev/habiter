@@ -12,7 +12,7 @@ const Index = () => {
       {/* Minimal Header */}
       <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-black/5 py-4">
         <div className="container px-4 mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">HabitFlow</h1>
+          <h1 className="text-2xl font-bold">Habiter</h1>
           <div className="flex gap-2">
             <Link to="/login">
               <Button variant="ghost" size="sm" className="text-sm">

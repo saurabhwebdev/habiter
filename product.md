@@ -1,4 +1,3 @@
-
 # 📱 Habit Tracker App — Product Specification
 
 ## 🧩 Overview
@@ -22,120 +21,120 @@ A powerful, minimalist habit tracker built using **Next.js (React)** and **Supab
 ## 🌟 Core Features
 
 ### ✅ Tap-to-Track Habits
-- Each habit shown with a `+` button to log instantly.
-- Tap `+` for:
-  - Smoking a cigarette
-  - Drinking a glass of water
-  - Walking session
-  - Sugar/gutka consumption
+- [x] Each habit shown with a `+` button to log instantly.
+- [x] Tap `+` for:
+  - [x] Smoking a cigarette
+  - [x] Drinking a glass of water
+  - [x] Walking session
+  - [x] Sugar/gutka consumption
 
 ### ✏️ Input Custom Quantity
-- Users can optionally long-press or tap 🖊️ to enter units manually.
-- E.g., drank 2 glasses at once or smoked 2 cigarettes.
+- [x] Users can optionally long-press or tap 🖊️ to enter units manually.
+- [x] E.g., drank 2 glasses at once or smoked 2 cigarettes.
 
 ### 🧠 Cue–Habit–Reward (CHR) System
-- Each habit stores:
-  - **Cue**: What triggers the habit (e.g., stress)
-  - **Habit**: The behavior (e.g., smoke)
-  - **Reward**: What the user gets from it (e.g., calmness)
-- Shown as reminders to create mindfulness around actions.
+- [x] Each habit stores:
+  - [x] **Cue**: What triggers the habit (e.g., stress)
+  - [x] **Habit**: The behavior (e.g., smoke)
+  - [x] **Reward**: What the user gets from it (e.g., calmness)
+- [x] Shown as reminders to create mindfulness around actions.
 
 ### 📅 Daily Dashboard
-- Clean daily view showing:
-  - Habit name
-  - Count so far today
-  - Daily goal
-  - CHR summary
-  - Current streak
-- All updates live as user taps or edits.
+- [x] Clean daily view showing:
+  - [x] Habit name
+  - [x] Count so far today
+  - [x] Daily goal
+  - [x] CHR summary
+  - [x] Current streak
+- [x] All updates live as user taps or edits.
 
 ### 🔥 Streak System
-- Tracks streaks for every habit.
-  - “3 days no gutka”
-  - “5 days of drinking 3L+ water”
-- Visual progress boosts motivation.
+- [x] Tracks streaks for every habit.
+  - [x] "3 days no gutka"
+  - [x] "5 days of drinking 3L+ water"
+- [x] Visual progress boosts motivation.
 
 ### 📈 Weekly/Monthly Trends
-- Trend charts for each habit:
-  - Compare week over week
-  - See reduction or growth patterns
+- [x] Trend charts for each habit:
+  - [x] Compare week over week
+  - [x] See reduction or growth patterns
 
 ### 🎯 Daily Goals per Habit
-- Goal type:
-  - `Max` for bad habits (e.g., max 2 cigarettes)
-  - `Min` for good habits (e.g., min 3L water)
-- App shows progress bar toward goal.
+- [x] Goal type:
+  - [x] `Max` for bad habits (e.g., max 2 cigarettes)
+  - [x] `Min` for good habits (e.g., min 3L water)
+- [x] App shows progress bar toward goal.
 
 ### 🔔 Smart Reminders (Optional)
-- Optional habit-based notifications (via browser and mobile push):
-  - “Log your water”
-  - “No smoking yet today — keep going!”
-- Can be toggled per habit.
+- [ ] Optional habit-based notifications (via browser and mobile push):
+  - [ ] "Log your water"
+  - [ ] "No smoking yet today — keep going!"
+- [ ] Can be toggled per habit.
 
 ### ☁️ Cloud Sync + Local Fallback
-- All data synced with Supabase.
-- Works offline using local storage.
-- Syncs when user comes back online.
+- [x] All data synced with Supabase.
+- [ ] Works offline using local storage.
+- [ ] Syncs when user comes back online.
 
 ### 🧾 Export Data
-- Users can export:
-  - CSV or PDF of logs
-  - Share with coach, doctor, or keep for self
+- [ ] Users can export:
+  - [ ] CSV or PDF of logs
+  - [ ] Share with coach, doctor, or keep for self
 
 ### 🧩 Customization
-- Add/edit/remove habits
-- Customize:
-  - Name
-  - Icon
-  - Goal type + target
-  - Units
-  - Cue, Habit, Reward values
+- [x] Add/edit/remove habits
+- [x] Customize:
+  - [x] Name
+  - [x] Icon
+  - [x] Goal type + target
+  - [x] Units
+  - [x] Cue, Habit, Reward values
 
 ---
 
 ## 🧭 UX Flow
 
 1. **Home Dashboard**
-   - Habit list
-   - Tap `+` to log instantly
-   - Tap 🖊️ to enter custom units
-   - Streak shown per habit
+   - [x] Habit list
+   - [x] Tap `+` to log instantly
+   - [x] Tap 🖊️ to enter custom units
+   - [x] Streak shown per habit
 
 2. **Add/Edit Habit Screen**
-   - Fields:
-     - Name
-     - Unit (e.g., cigarette, glass)
-     - Goal type: min or max
-     - Daily goal
-     - Cue, Habit, Reward
-     - Reminder toggle
+   - [x] Fields:
+     - [x] Name
+     - [x] Unit (e.g., cigarette, glass)
+     - [x] Goal type: min or max
+     - [x] Daily goal
+     - [x] Cue, Habit, Reward
+     - [x] Reminder toggle
 
 3. **Progress Screen**
-   - Graphs of each habit over time
-   - Filter by week/month
+   - [x] Graphs of each habit over time
+   - [x] Filter by week/month
 
 4. **Settings**
-   - Export data
-   - Change goal units
-   - Toggle notifications
-   - Sign in / out
+   - [ ] Export data
+   - [x] Change goal units
+   - [ ] Toggle notifications
+   - [x] Sign in / out
 
 ---
 
 ## 🎨 UI Design Principles
 
-- **Mobile-first design**
-  - Responsive using Tailwind CSS
-  - Fully installable PWA
-- **Clean & focused UI**
-  - Minimal distractions
-  - Easy 1-tap logging
-- **Accessible**
-  - High contrast, legible fonts, keyboard navigation
-- **Motivating visuals**
-  - Emojis/icons per habit
-  - 🔥 streaks
-  - 🧠 CHR reminders
+- [x] **Mobile-first design**
+  - [x] Responsive using Tailwind CSS
+  - [ ] Fully installable PWA
+- [x] **Clean & focused UI**
+  - [x] Minimal distractions
+  - [x] Easy 1-tap logging
+- [x] **Accessible**
+  - [x] High contrast, legible fonts, keyboard navigation
+- [x] **Motivating visuals**
+  - [x] Emojis/icons per habit
+  - [x] 🔥 streaks
+  - [x] 🧠 CHR reminders
 
 ---
 
@@ -188,22 +187,46 @@ last_successful_day (date)
 - [x] Streak calculation
 - [x] Progress graph
 - [x] Supabase sync
-- [x] Export data
+- [ ] Export data
 - [x] Responsive design + PWA
 
 ---
 
 ## 🌱 Future Enhancements (Post-MVP)
 
-- AI habit suggestion system (Gemini/OpenAI)
-- Social sharing or accountability partner
-- Mood journaling per log
-- Habit bundles (e.g., morning routine group)
-- In-app motivational quotes or rewards
-- Weekly recap email/report
+- [x] AI habit suggestion system (Gemini/OpenAI) - Implemented with motivational messages
+- [ ] Social sharing or accountability partner
+- [ ] Mood journaling per log
+- [ ] Habit bundles (e.g., morning routine group)
+- [x] In-app motivational quotes or rewards - Implemented with Gemini API
+- [ ] Weekly recap email/report
 
 ---
 
 ## 📌 Summary
 
-This app helps users build or break habits using simple daily tracking powered by Cue–Habit–Reward. It’s built with Next.js and Supabase to ensure cloud sync, speed, and scalability. With a clean mobile-first UI and data-rich tracking system, it empowers people to make better decisions daily — one tap at a time.
+This app helps users build or break habits using simple daily tracking powered by Cue–Habit–Reward. It's built with Next.js and Supabase to ensure cloud sync, speed, and scalability. With a clean mobile-first UI and data-rich tracking system, it empowers people to make better decisions daily — one tap at a time.
+
+## 🚧 Pending Features
+
+1. **Smart Reminders**
+   - Browser and mobile push notifications
+   - Configurable reminders per habit
+
+2. **Offline Support**
+   - Local storage fallback when offline
+   - Data syncing when back online
+
+3. **Data Export**
+   - CSV/PDF export functionality
+   - Sharing options for coaches/doctors
+
+4. **PWA Installation**
+   - Complete PWA configuration
+   - App installation on mobile devices
+
+5. **Additional Features**
+   - Social sharing/accountability
+   - Mood journaling
+   - Habit bundles
+   - Weekly recap emails
