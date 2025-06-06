@@ -109,7 +109,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onUpdate }) => {
             <span className="text-xl">{habit.icon || '📝'}</span> {habit.name}
           </CardTitle>
           <CardDescription>
-            {habit.goal_type === 'min' ? 'Min' : 'Max'} {habit.daily_goal} {habit.unit}{habit.daily_goal > 1 ? 's' : ''} daily
+            {habit.goal_type === 'min' ? '≥' : '≤'} {habit.daily_goal} {habit.unit}{habit.daily_goal > 1 ? 's' : ''} daily
           </CardDescription>
         </CardHeader>
         

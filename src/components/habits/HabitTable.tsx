@@ -227,7 +227,7 @@ export const HabitTable: React.FC<HabitTableProps> = ({ habits, onUpdate }) => {
                 <TableCell className={cn("py-2 px-3 text-xs text-gray-700 align-middle", columnWidths.goal)}>
                   <div className="flex justify-center">
                     <span className="whitespace-nowrap">
-                      {habit.goal_type === 'min' ? '≤' : '≥'} {habit.daily_goal} {habit.unit}
+                      {habit.goal_type === 'min' ? '≥' : '≤'} {habit.daily_goal} {habit.unit}
                     </span>
                   </div>
                 </TableCell>
