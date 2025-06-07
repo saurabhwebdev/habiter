@@ -27,7 +27,7 @@ const habitSchema = z.object({
   icon: z.string().optional(),
   unit: z.string().min(1, 'Unit is required'),
   goal_type: z.enum(['min', 'max']),
-  daily_goal: z.coerce.number().positive('Goal must be a positive number'),
+  daily_goal: z.coerce.number().min(0, 'Goal must be at least 0'),
   cue: z.string().optional(),
   habit: z.string().optional(),
   reward: z.string().optional(),
@@ -44,6 +44,15 @@ const habitSchema = z.object({
   fixed_days_target: z.coerce.number().optional(),
   fixed_days_start_date: z.string().optional(),
   fixed_days_progress: z.coerce.number().optional()
+}).refine((data) => {
+  // For positive habits, ensure daily goal is at least 1
+  if (data.type === 'positive' && data.daily_goal < 1) {
+    return false;
+  }
+  return true;
+}, {
+  message: "For positive habits, the goal must be at least 1",
+  path: ["daily_goal"]
 });
 
 type HabitFormValues = z.infer<typeof habitSchema>;
@@ -358,7 +367,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel
                   <FormControl>
                     <Input 
                       type="number" 
-                      min="1"
+                      min={form.watch('type') === 'negative' && form.watch('goal_type') === 'max' ? "0" : "1"}
                       {...field} 
                       className="border-black/20 focus:border-black"
                     />
