@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Statistics from "./pages/Statistics";
 import Journal from "./pages/Journal";
+import Archive from "./pages/Archive";
 import Help from "./pages/Help";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
@@ -59,6 +60,11 @@ const App = () => (
             <Route path="/journal" element={
               <ProtectedRoute>
                 <Journal />
+              </ProtectedRoute>
+            } />
+            <Route path="/archive" element={
+              <ProtectedRoute>
+                <Archive />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

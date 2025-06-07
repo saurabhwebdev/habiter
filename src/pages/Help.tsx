@@ -31,7 +31,9 @@ import {
   Pencil,
   Filter,
   ThumbsUp,
-  ThumbsDown
+  ThumbsDown,
+  Flag,
+  Archive
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -99,6 +101,10 @@ const Help = () => {
                       <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
                       <span>Get inspired by motivational messages that refresh every 30 seconds</span>
                     </li>
+                    <li className="flex items-start gap-2">
+                      <div className="mt-1 text-black/70"><Archive className="h-4 w-4" /></div>
+                      <span>Access the Archive page from the navbar to view and manage archived habits</span>
+                    </li>
                   </ul>
                 </AccordionContent>
               </AccordionItem>
@@ -130,6 +136,14 @@ const Help = () => {
                     </div>
                   </div>
                   <p className="mt-4">Each habit type has different tracking mechanisms to help you achieve your goals.</p>
+                  <div className="mt-4 p-3 bg-black/5 rounded-md">
+                    <div className="flex items-start gap-2">
+                      <div className="mt-0.5"><Archive className="h-4 w-4 text-black/70" /></div>
+                      <p className="text-sm">
+                        <strong>Habit Organization:</strong> You can archive habits you've completed or want to temporarily pause tracking. Archived habits can be viewed in the Archive page and restored at any time.
+                      </p>
+                    </div>
+                  </div>
                 </AccordionContent>
               </AccordionItem>
 
@@ -158,6 +172,10 @@ const Help = () => {
                     <li className="flex items-start gap-2">
                       <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
                       <span>Watch your streaks grow as you consistently maintain your habits</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="mt-1 text-black/70"><Flag className="h-4 w-4" /></div>
+                      <span>Set fixed-day goals to track habits for a specific duration (e.g., 30-day challenges)</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="mt-1 text-black/70"><DollarSign className="h-4 w-4" /></div>
@@ -288,6 +306,94 @@ const Help = () => {
                   <p className="text-sm">
                     <strong>Pro Tip:</strong> Use the money saved as motivation to continue your habit-breaking journey. 
                     Consider setting aside the saved money for a reward when you reach a milestone.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-black/10 mb-6 overflow-hidden">
+              <div className="bg-black/5 p-4 flex items-center gap-3">
+                <Flag className="h-6 w-6 text-black/70" />
+                <div>
+                  <CardTitle>Fixed-Days Tracking</CardTitle>
+                  <CardDescription>Track habits for a specific duration</CardDescription>
+                </div>
+              </div>
+              <CardContent className="pt-6">
+                <p className="text-black/70 mb-4">
+                  The fixed-days feature helps you track habits with a specific duration goal:
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Enable fixed-days tracking when creating or editing a habit</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Set a target number of days (e.g., "no sugar for 30 days")</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Choose a start date for your tracking period</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Track your progress with a visual progress bar showing days completed and remaining</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Get notified when you complete your fixed-days challenge</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Extend your goal with additional days when you reach your target</span>
+                  </li>
+                </ul>
+                <div className="mt-4 p-3 bg-black/5 rounded-md">
+                  <p className="text-sm">
+                    <strong>Pro Tip:</strong> Fixed-days tracking is perfect for habit challenges like "Dry January," "No-Sugar November," or "30-Day Fitness Challenge." Use it to set concrete goals with definite endpoints.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-black/10 mb-6 overflow-hidden">
+              <div className="bg-black/5 p-4 flex items-center gap-3">
+                <Archive className="h-6 w-6 text-black/70" />
+                <div>
+                  <CardTitle>Habit Archiving</CardTitle>
+                  <CardDescription>Keep your dashboard focused and organized</CardDescription>
+                </div>
+              </div>
+              <CardContent className="pt-6">
+                <p className="text-black/70 mb-4">
+                  The archiving feature helps you manage completed or paused habits:
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Archive habits you've completed or temporarily don't want to track</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Keep your active dashboard clean and focused on current habits</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Fixed-days habits can be automatically archived upon completion</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>View all archived habits in the Archive page</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Unarchive habits at any time to resume tracking them</span>
+                  </li>
+                </ul>
+                <div className="mt-4 p-3 bg-black/5 rounded-md">
+                  <p className="text-sm">
+                    <strong>Pro Tip:</strong> Use archiving for seasonal habits (like "Rake leaves") or for habits you've successfully incorporated into your lifestyle and no longer need to actively track.
                   </p>
                 </div>
               </CardContent>
@@ -504,6 +610,18 @@ const Help = () => {
                     <div className="mt-1 text-black/70"><Heart className="h-5 w-5" /></div>
                     <div>
                       <strong>Be patient:</strong> Building new habits takes time, typically 21-66 days to form
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3 p-3 rounded-md bg-black/5">
+                    <div className="mt-1 text-black/70"><Flag className="h-5 w-5" /></div>
+                    <div>
+                      <strong>Use fixed-days for challenges:</strong> When you want to build a temporary habit or complete a specific challenge, use the fixed-days tracking feature
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3 p-3 rounded-md bg-black/5">
+                    <div className="mt-1 text-black/70"><Archive className="h-5 w-5" /></div>
+                    <div>
+                      <strong>Declutter with archiving:</strong> Keep your dashboard focused by archiving completed or temporarily paused habits
                     </div>
                   </li>
                   <li className="flex items-start gap-3 p-3 rounded-md bg-black/5">

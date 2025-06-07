@@ -22,6 +22,12 @@ export interface Habit {
   tapering_end_date?: string;
   tapering_start_value?: number;
   tapering_target_value?: number;
+  fixed_days_enabled?: boolean;
+  fixed_days_target?: number;
+  fixed_days_start_date?: string;
+  fixed_days_progress?: number;
+  archived?: boolean;
+  archived_at?: string;
   created_at: string;
   updated_at: string;
 }
@@ -88,6 +94,10 @@ export interface NewHabit {
   tapering_end_date?: string;
   tapering_start_value?: number;
   tapering_target_value?: number;
+  fixed_days_enabled?: boolean;
+  fixed_days_target?: number;
+  fixed_days_start_date?: string;
+  fixed_days_progress?: number;
 }
 
 export interface NewHabitLog {
@@ -106,6 +116,7 @@ export interface HabitFilters {
   search?: string;
   sortBy?: 'name' | 'created_at' | 'progress';
   sortDirection?: 'asc' | 'desc';
+  includeArchived?: boolean;
 }
 
 export interface DateRange {

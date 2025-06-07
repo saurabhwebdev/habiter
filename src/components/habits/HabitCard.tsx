@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { habitService } from '@/lib/habitService';
 import { toast } from '@/components/ui/use-toast';
-import { Pencil, Info, Edit, DollarSign } from 'lucide-react';
+import { Pencil, Info, Edit, DollarSign, Archive, Clock, CalendarPlus } from 'lucide-react';
 import { HabitDialog } from './HabitDialog';
 
 interface HabitCardProps {
@@ -23,6 +23,9 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onUpdate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [logCount, setLogCount] = useState(1);
   const [showCHR, setShowCHR] = useState(false);
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+  const [showExtendDays, setShowExtendDays] = useState(false);
+  const [additionalDays, setAdditionalDays] = useState(7); // Default to 7 days
 
   const handleLogHabit = async (count: number = 1) => {
     try {
@@ -85,6 +88,66 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onUpdate }) => {
     });
   };
 
+  // Handle archiving a habit
+  const handleArchiveHabit = async () => {
+    try {
+      setIsLoading(true);
+      await habitService.archiveHabit(habit.id);
+      toast({
+        title: "Habit archived",
+        description: `${habit.name} has been archived successfully.`,
+      });
+      onUpdate();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to archive habit. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+      setShowArchiveConfirm(false);
+    }
+  };
+
+  // Handle extending days for a fixed-days habit
+  const handleExtendDays = async () => {
+    try {
+      setIsLoading(true);
+      await habitService.extendFixedDaysHabit(habit.id, additionalDays);
+      toast({
+        title: "Days extended",
+        description: `Added ${additionalDays} more days to "${habit.name}".`,
+      });
+      onUpdate();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to extend days. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+      setShowExtendDays(false);
+    }
+  };
+
+  // Determine if the habit should be auto-archived
+  const shouldAutoArchive = () => {
+    if (habit.fixed_days_enabled && habit.fixed_days_target && habit.fixed_days_progress) {
+      return habit.fixed_days_progress >= habit.fixed_days_target;
+    }
+    return false;
+  };
+
+  // Auto-archive if needed
+  React.useEffect(() => {
+    if (shouldAutoArchive()) {
+      // We could automatically archive, but it's better to let the user decide
+      // If we wanted to auto-archive, we would call handleArchiveHabit() here
+    }
+  }, [habit]);
+
   return (
     <>
       <Card className="border-black/10 hover:border-black/20 transition-colors">
@@ -112,6 +175,14 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onUpdate }) => {
                 onClick={() => setShowCHR(true)}
               >
                 <Info className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 w-8 p-0" 
+                onClick={() => setShowArchiveConfirm(true)}
+              >
+                <Archive className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -167,6 +238,46 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onUpdate }) => {
                     className="h-1 bg-blue-600 rounded-full" 
                     style={{ 
                       width: `${calculateTaperingProgress()}%` 
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Fixed Days Tracking Display (if enabled) */}
+            {habit.fixed_days_enabled && (
+              <div className="mt-3 pt-3 border-t border-black/10">
+                <div className="flex justify-between items-center">
+                  <p className="text-sm font-medium">Fixed Days Challenge</p>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                      {calculateDaysRemaining() > 0 ? 'In Progress' : 'Completed!'}
+                    </span>
+                    {calculateDaysRemaining() <= 0 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0"
+                        onClick={() => setShowExtendDays(true)}
+                      >
+                        <CalendarPlus className="h-3.5 w-3.5 text-purple-700" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <div className="flex justify-between text-xs text-black/70 mt-1">
+                  <span>Started: {formatDate(habit.fixed_days_start_date)}</span>
+                  <span>Goal: {habit.fixed_days_target} days</span>
+                </div>
+                <div className="flex justify-between text-xs text-black/70 mt-1">
+                  <span>Progress: {habit.fixed_days_progress || 0} days completed</span>
+                  <span>{calculateDaysRemaining()} days remaining</span>
+                </div>
+                <div className="w-full h-1 bg-black/10 rounded-full mt-2">
+                  <div 
+                    className="h-1 bg-purple-600 rounded-full" 
+                    style={{ 
+                      width: `${calculateFixedDaysProgress()}%` 
                     }}
                   />
                 </div>
@@ -315,6 +426,82 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onUpdate }) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Archive Confirmation Dialog */}
+      <Dialog open={showArchiveConfirm} onOpenChange={setShowArchiveConfirm}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Archive Habit</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to archive "{habit.name}"? 
+              Archived habits will be moved to the archive section and will no longer appear on your dashboard.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowArchiveConfirm(false)}
+              className="border-black/20"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleArchiveHabit} 
+              disabled={isLoading}
+              className="bg-black text-white hover:bg-black/90"
+            >
+              {isLoading ? 'Archiving...' : 'Archive Habit'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Extend Days Dialog */}
+      <Dialog open={showExtendDays} onOpenChange={setShowExtendDays}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Extend Challenge Days</DialogTitle>
+            <DialogDescription>
+              Add more days to your "{habit.name}" challenge.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="additionalDays" className="text-right">
+                Days to add
+              </Label>
+              <Input
+                id="additionalDays"
+                type="number"
+                min={1}
+                value={additionalDays}
+                onChange={(e) => setAdditionalDays(parseInt(e.target.value) || 1)}
+                className="col-span-3 border-black/20 focus:border-black"
+              />
+            </div>
+            <div className="col-span-4 text-sm text-black/70">
+              <p>Current: {habit.fixed_days_target} days</p>
+              <p>New total: {(habit.fixed_days_target || 0) + additionalDays} days</p>
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowExtendDays(false)}
+              className="border-black/20"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleExtendDays} 
+              disabled={isLoading}
+              className="bg-purple-600 text-white hover:bg-purple-700"
+            >
+              {isLoading ? 'Extending...' : 'Extend Challenge'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 
@@ -339,5 +526,41 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onUpdate }) => {
     const daysPassed = (today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
     
     return Math.round((daysPassed / totalDays) * 100);
+  }
+
+  // Helper function to calculate days remaining
+  function calculateDaysRemaining(): number {
+    if (!habit.fixed_days_enabled || !habit.fixed_days_start_date || !habit.fixed_days_target) {
+      return 0;
+    }
+    
+    const startDate = new Date(habit.fixed_days_start_date);
+    const today = new Date();
+    
+    // Calculate days passed
+    const daysPassed = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Calculate days remaining
+    const daysRemaining = habit.fixed_days_target - daysPassed;
+    
+    return Math.max(daysRemaining, 0);
+  }
+
+  // Helper function to calculate fixed days progress
+  function calculateFixedDaysProgress(): number {
+    if (!habit.fixed_days_enabled || !habit.fixed_days_start_date || !habit.fixed_days_target) {
+      return 0;
+    }
+    
+    const startDate = new Date(habit.fixed_days_start_date);
+    const today = new Date();
+    
+    // Calculate days passed
+    const daysPassed = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Calculate progress percentage
+    const progressPercentage = (daysPassed / habit.fixed_days_target) * 100;
+    
+    return Math.min(Math.round(progressPercentage), 100);
   }
 }; 

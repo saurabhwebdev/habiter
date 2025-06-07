@@ -115,7 +115,7 @@ export const Footer = () => {
 
       {/* Feedback Dialog */}
       <Dialog open={showFeedbackForm} onOpenChange={setShowFeedbackForm}>
-        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto" hideCloseButton>
           <div className="absolute right-4 top-4 z-50">
             <Button 
               variant="ghost" 

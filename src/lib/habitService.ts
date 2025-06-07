@@ -20,7 +20,8 @@ export const habitService = {
   async getHabits(filters?: HabitFilters): Promise<Habit[]> {
     let query = supabase
       .from('habits')
-      .select('*');
+      .select('*')
+      .eq('archived', false); // Only get non-archived habits by default
     
     // Apply filters if provided
     if (filters) {
@@ -37,6 +38,29 @@ export const habitService = {
         query = query.order(filters.sortBy, { ascending: direction === 'asc' });
       } else {
         query = query.order('created_at', { ascending: false });
+      }
+
+      // If includeArchived is true, don't filter by archived status
+      if (filters.includeArchived) {
+        query = supabase
+          .from('habits')
+          .select('*');
+          
+        // Re-apply the other filters
+        if (filters.type) {
+          query = query.eq('type', filters.type);
+        }
+        
+        if (filters.search) {
+          query = query.ilike('name', `%${filters.search}%`);
+        }
+        
+        if (filters.sortBy) {
+          const direction = filters.sortDirection || 'asc';
+          query = query.order(filters.sortBy, { ascending: direction === 'asc' });
+        } else {
+          query = query.order('created_at', { ascending: false });
+        }
       }
     }
     
@@ -192,6 +216,29 @@ export const habitService = {
     if (error) {
       console.error('Error creating habit log:', error);
       throw error;
+    }
+
+    // Check if this is a habit with fixed days tracking
+    const { data: habitData, error: habitError } = await supabase
+      .from('habits')
+      .select('*')
+      .eq('id', log.habit_id)
+      .single();
+
+    if (!habitError && habitData && habitData.fixed_days_enabled) {
+      // Get existing logs for today to check if this is the first log of the day
+      const existingLogs = await this.getHabitLogsForDate(log.habit_id, date);
+      
+      // If this is the first log of the day, increment the fixed_days_progress
+      if (existingLogs.length <= 1) { // 1 because we just created a log
+        // Update the fixed_days_progress
+        await supabase
+          .from('habits')
+          .update({ 
+            fixed_days_progress: (habitData.fixed_days_progress || 0) + 1 
+          })
+          .eq('id', log.habit_id);
+      }
     }
     
     return data as HabitLog;
@@ -633,5 +680,97 @@ export const habitService = {
       console.error('Error deleting journal entry:', error);
       throw error;
     }
+  },
+
+  async getArchivedHabits(): Promise<Habit[]> {
+    const { data, error } = await supabase
+      .from('habits')
+      .select('*')
+      .eq('archived', true)
+      .order('archived_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching archived habits:', error);
+      throw error;
+    }
+    
+    return data as Habit[];
+  },
+
+  async archiveHabit(id: string): Promise<Habit> {
+    const now = new Date().toISOString();
+    const { data, error } = await supabase
+      .from('habits')
+      .update({ 
+        archived: true,
+        archived_at: now
+      })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error archiving habit:', error);
+      throw error;
+    }
+    
+    return data as Habit;
+  },
+
+  async unarchiveHabit(id: string): Promise<Habit> {
+    const { data, error } = await supabase
+      .from('habits')
+      .update({ 
+        archived: false,
+        archived_at: null
+      })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error unarchiving habit:', error);
+      throw error;
+    }
+    
+    return data as Habit;
+  },
+
+  async extendFixedDaysHabit(id: string, additionalDays: number): Promise<Habit> {
+    // First get the current habit
+    const { data: habit, error: getError } = await supabase
+      .from('habits')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (getError) {
+      console.error('Error getting habit for extension:', getError);
+      throw getError;
+    }
+    
+    if (!habit.fixed_days_enabled || !habit.fixed_days_target) {
+      throw new Error('Cannot extend a habit that does not have fixed days tracking enabled');
+    }
+    
+    // Calculate the new target
+    const newTarget = habit.fixed_days_target + additionalDays;
+    
+    // Update the habit
+    const { data, error } = await supabase
+      .from('habits')
+      .update({ 
+        fixed_days_target: newTarget
+      })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error extending habit days:', error);
+      throw error;
+    }
+    
+    return data as Habit;
   },
 }; 

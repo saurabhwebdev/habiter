@@ -39,7 +39,11 @@ const habitSchema = z.object({
   tapering_start_date: z.string().optional(),
   tapering_end_date: z.string().optional(),
   tapering_start_value: z.coerce.number().optional(),
-  tapering_target_value: z.coerce.number().default(0)
+  tapering_target_value: z.coerce.number().default(0),
+  fixed_days_enabled: z.boolean().default(false),
+  fixed_days_target: z.coerce.number().optional(),
+  fixed_days_start_date: z.string().optional(),
+  fixed_days_progress: z.coerce.number().optional()
 });
 
 type HabitFormValues = z.infer<typeof habitSchema>;
@@ -55,6 +59,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel
   const isEditing = !!habit;
   const [showMoneyTracking, setShowMoneyTracking] = useState(false);
   const [showTapering, setShowTapering] = useState(false);
+  const [showFixedDays, setShowFixedDays] = useState(false);
 
   // Initialize the form with default values or existing habit values
   const form = useForm<HabitFormValues>({
@@ -64,7 +69,11 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel
           ...habit,
           tapering_enabled: habit.tapering_enabled || false,
           tapering_start_value: habit.tapering_start_value || habit.daily_goal,
-          tapering_target_value: habit.tapering_target_value || 0
+          tapering_target_value: habit.tapering_target_value || 0,
+          fixed_days_enabled: habit.fixed_days_enabled || false,
+          fixed_days_target: habit.fixed_days_target || 30,
+          fixed_days_start_date: habit.fixed_days_start_date || format(new Date(), 'yyyy-MM-dd'),
+          fixed_days_progress: habit.fixed_days_progress || 0
         }
       : {
           name: '',
@@ -84,7 +93,11 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel
           tapering_start_date: format(new Date(), 'yyyy-MM-dd'),
           tapering_end_date: format(new Date(new Date().setDate(new Date().getDate() + 30)), 'yyyy-MM-dd'),
           tapering_start_value: 1,
-          tapering_target_value: 0
+          tapering_target_value: 0,
+          fixed_days_enabled: false,
+          fixed_days_target: 30,
+          fixed_days_start_date: format(new Date(), 'yyyy-MM-dd'),
+          fixed_days_progress: 0
         }
   });
 
@@ -133,6 +146,14 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel
     }
   }, [habitType, form]);
 
+  // Watch for changes to fixed_days_enabled
+  const fixedDaysEnabled = form.watch('fixed_days_enabled');
+  
+  // Show fixed days section
+  useEffect(() => {
+    setShowFixedDays(fixedDaysEnabled);
+  }, [fixedDaysEnabled]);
+
   // Handle form submission
   const onSubmit = async (data: HabitFormValues) => {
     try {
@@ -155,6 +176,26 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel
       if (!data.money_tracking_enabled) {
         data.cost_per_unit = undefined;
         data.currency = 'USD';
+      }
+
+      // If tapering is not enabled, set related fields to null
+      if (!data.tapering_enabled) {
+        data.tapering_start_date = undefined;
+        data.tapering_end_date = undefined;
+        data.tapering_start_value = undefined;
+        data.tapering_target_value = undefined;
+      }
+
+      // If fixed days tracking is not enabled, set related fields to null
+      if (!data.fixed_days_enabled) {
+        data.fixed_days_target = undefined;
+        data.fixed_days_start_date = undefined;
+        data.fixed_days_progress = undefined;
+      } else {
+        // Initialize progress to 0 for new habits
+        if (!isEditing) {
+          data.fixed_days_progress = 0;
+        }
       }
       
       if (isEditing && habit) {
@@ -444,6 +485,107 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel
                       </Select>
                       <FormDescription>
                         Select your preferred currency
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          )}
+          
+          {/* Fixed Days Tracking Toggle */}
+          <FormField
+            control={form.control}
+            name="fixed_days_enabled"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border border-black/10 p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">Track for Fixed Number of Days</FormLabel>
+                  <FormDescription>
+                    Set a specific number of days to track this habit (e.g., "Do not eat sugar for 10 days")
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          
+          {/* Fixed Days Tracking Fields (conditional) */}
+          {showFixedDays && (
+            <div className="space-y-4 border border-black/10 p-4 rounded-md">
+              <h3 className="font-medium">Fixed Days Tracking Settings</h3>
+              <p className="text-sm text-black/70">
+                Track this habit for a specific number of days
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Target Days */}
+                <FormField
+                  control={form.control}
+                  name="fixed_days_target"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Number of Days</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          min="1"
+                          step="1"
+                          {...field} 
+                          className="border-black/20 focus:border-black"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        How many days do you want to track this habit?
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Start Date */}
+                <FormField
+                  control={form.control}
+                  name="fixed_days_start_date"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Start Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal border-black/20 focus:border-black",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(new Date(field.value), "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value ? new Date(field.value) : undefined}
+                            onSelect={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : undefined)}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormDescription>
+                        When should tracking begin?
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
