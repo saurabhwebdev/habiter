@@ -20,7 +20,8 @@ import {
   Flame, 
   Filter, 
   SlidersHorizontal,
-  Sparkles
+  Sparkles,
+  Clock
 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { HabitDialog } from '@/components/habits/HabitDialog';
@@ -49,6 +50,17 @@ const Dashboard = () => {
   });
   const [showCompleted, setShowCompleted] = useState(true);
   const [sortBy, setSortBy] = useState<'progress' | 'name' | 'streak'>('progress');
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    // Update time every second
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    
+    // Cleanup interval on component unmount
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     // Update view mode based on screen size
@@ -99,10 +111,10 @@ const Dashboard = () => {
       const bStreak = b.current_streak || 0;
       return bStreak - aStreak;
     } else {
-      // First sort by goal met status (unmet goals first)
-      if (a.goal_met !== b.goal_met) {
-        return a.goal_met ? 1 : -1;
-      }
+    // First sort by goal met status (unmet goals first)
+    if (a.goal_met !== b.goal_met) {
+      return a.goal_met ? 1 : -1;
+    }
       // Then sort by progress percentage (higher first)
       return b.progress_percentage - a.progress_percentage;
     }
@@ -129,6 +141,16 @@ const Dashboard = () => {
     });
   };
 
+  // Format time in HH:MM:SS AM/PM
+  const formatTime = () => {
+    return currentTime.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+  };
+
   // Generate greeting based on time of day
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -142,20 +164,27 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="space-y-6">
           {/* Header Section with User Greeting */}
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 shadow-sm border border-blue-100">
+          <div className="bg-gradient-to-r from-gray-900 to-black rounded-xl p-6 shadow-md border border-gray-800">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div>
-                <h1 className="text-2xl font-bold text-blue-900">
+            <div>
+                <h1 className="text-2xl font-bold text-white">
                   {getGreeting()}, {user?.email?.split('@')[0] || 'there'}
                 </h1>
-                <p className="text-blue-700 mt-1">
-                  {formatDate()}
-                </p>
-              </div>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-gray-300">
+                    {formatDate()}
+                  </p>
+                  <span className="text-gray-300">•</span>
+                  <p className="text-gray-300 flex items-center">
+                    <Clock className="h-4 w-4 mr-1" />
+                    {formatTime()}
+                  </p>
+                </div>
+            </div>
               <div className="w-full md:w-auto">
                 <Button 
                   onClick={() => setShowAddHabitForm(true)}
-                  className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full md:w-auto bg-gray-800 hover:bg-gray-700 text-white border border-gray-600"
                   size="lg"
                 >
                   <PlusCircle className="h-5 w-5 mr-2" /> Create New Habit
@@ -166,37 +195,37 @@ const Dashboard = () => {
 
           {/* Dashboard Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="border-blue-100 shadow-sm">
+            <Card className="border-gray-200 shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-blue-700">Total Habits</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-900">Total Habits</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex justify-between items-center">
                   <div className="text-3xl font-bold">{totalHabits}</div>
-                  <div className="p-2 bg-blue-50 rounded-full">
-                    <CalendarDays className="h-5 w-5 text-blue-700" />
+                  <div className="p-2 bg-gray-100 rounded-full">
+                    <CalendarDays className="h-5 w-5 text-gray-700" />
                   </div>
                 </div>
                 <div className="flex items-center gap-2 mt-2 text-sm">
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
                     {positiveHabits} positive
                   </Badge>
-                  <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                  <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
                     {negativeHabits} negative
                   </Badge>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="border-blue-100 shadow-sm">
+            <Card className="border-gray-200 shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-blue-700">Today's Progress</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-900">Today's Progress</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex justify-between items-center">
                   <div className="text-3xl font-bold">{completionPercentage}%</div>
-                  <div className="p-2 bg-green-50 rounded-full">
-                    <CheckCircle2 className="h-5 w-5 text-green-700" />
+                  <div className="p-2 bg-gray-100 rounded-full">
+                    <CheckCircle2 className="h-5 w-5 text-gray-700" />
                   </div>
                 </div>
                 <div className="mt-2">
@@ -208,15 +237,15 @@ const Dashboard = () => {
               </CardContent>
             </Card>
             
-            <Card className="border-blue-100 shadow-sm">
+            <Card className="border-gray-200 shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-blue-700">Longest Streak</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-900">Longest Streak</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex justify-between items-center">
                   <div className="text-3xl font-bold">{longestStreak} days</div>
-                  <div className="p-2 bg-amber-50 rounded-full">
-                    <Flame className="h-5 w-5 text-amber-600" />
+                  <div className="p-2 bg-gray-100 rounded-full">
+                    <Flame className="h-5 w-5 text-gray-700" />
                   </div>
                 </div>
                 {habitWithLongestStreak && (
@@ -227,13 +256,13 @@ const Dashboard = () => {
               </CardContent>
             </Card>
             
-            <Card className="border-blue-100 shadow-sm">
+            <Card className="border-gray-200 shadow-sm">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 bg-blue-50 rounded-full">
-                    <Sparkles className="h-4 w-4 text-blue-700" />
+                  <div className="p-2 bg-gray-100 rounded-full">
+                    <Sparkles className="h-4 w-4 text-gray-700" />
                   </div>
-                  <span className="text-sm font-medium text-blue-700">Daily Inspiration</span>
+                  <span className="text-sm font-medium text-gray-900">Daily Inspiration</span>
                 </div>
                 <MotivationalMessage />
               </CardContent>
@@ -241,31 +270,31 @@ const Dashboard = () => {
           </div>
 
           {/* Enhanced Search and Filter Controls */}
-          <Card className="border-blue-100 shadow-sm">
+          <Card className="border-gray-200 shadow-sm">
             <CardContent className="p-4">
-              <div className="flex flex-col sm:flex-row justify-between gap-4">
+          <div className="flex flex-col sm:flex-row justify-between gap-4">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Search habits..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+              <Input
+                placeholder="Search habits..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
+              />
+            </div>
                 <div className="flex flex-wrap gap-2 items-center">
-                  <Tabs 
-                    value={activeTab} 
-                    onValueChange={(value) => setActiveTab(value as 'all' | 'positive' | 'negative')}
-                    className="w-full sm:w-auto"
-                  >
+              <Tabs 
+                value={activeTab} 
+                onValueChange={(value) => setActiveTab(value as 'all' | 'positive' | 'negative')}
+                className="w-full sm:w-auto"
+              >
                     <TabsList className="grid grid-cols-3 w-full sm:w-auto bg-gray-100">
                       <TabsTrigger value="all" className="data-[state=active]:bg-white">All</TabsTrigger>
                       <TabsTrigger value="positive" className="data-[state=active]:bg-white data-[state=active]:text-green-700">Positive</TabsTrigger>
                       <TabsTrigger value="negative" className="data-[state=active]:bg-white data-[state=active]:text-red-700">Negative</TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-                  
+                </TabsList>
+              </Tabs>
+              
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="outline" size="sm" className="border-gray-200 gap-1">
@@ -320,29 +349,29 @@ const Dashboard = () => {
                         <div className="space-y-2">
                           <h4 className="font-medium leading-none">View</h4>
                           <Separator />
-                          <ToggleGroup 
-                            type="single" 
-                            value={viewMode} 
-                            onValueChange={(value) => {
-                              if (value) setViewMode(value as 'card' | 'table');
-                            }}
+              <ToggleGroup 
+                type="single" 
+                value={viewMode} 
+                onValueChange={(value) => {
+                  if (value) setViewMode(value as 'card' | 'table');
+                }}
                             className="justify-start"
-                          >
+              >
                             <ToggleGroupItem value="card" aria-label="Card View" className="border border-gray-200 data-[state=on]:bg-blue-600">
                               <LayoutGrid className="h-4 w-4 mr-2" />
                               Cards
-                            </ToggleGroupItem>
+                </ToggleGroupItem>
                             <ToggleGroupItem value="table" aria-label="Table View" className="border border-gray-200 data-[state=on]:bg-blue-600">
                               <List className="h-4 w-4 mr-2" />
                               Table
-                            </ToggleGroupItem>
-                          </ToggleGroup>
+                </ToggleGroupItem>
+              </ToggleGroup>
                         </div>
                       </div>
                     </PopoverContent>
                   </Popover>
-                </div>
-              </div>
+            </div>
+          </div>
             </CardContent>
           </Card>
 
@@ -411,13 +440,13 @@ const Dashboard = () => {
                     <h3 className="text-lg font-medium mb-2">You haven't added any habits yet</h3>
                     <p className="text-gray-600 mb-4">
                       Start your habit tracking journey by creating your first habit.
-                    </p>
-                    <Button 
-                      onClick={() => setShowAddHabitForm(true)}
+                </p>
+                <Button 
+                  onClick={() => setShowAddHabitForm(true)}
                       className="bg-blue-600 text-white hover:bg-blue-700"
-                    >
-                      <PlusCircle className="h-4 w-4 mr-2" /> Add Your First Habit
-                    </Button>
+                >
+                  <PlusCircle className="h-4 w-4 mr-2" /> Add Your First Habit
+                </Button>
                   </div>
                 )}
               </div>
