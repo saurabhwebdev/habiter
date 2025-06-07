@@ -540,6 +540,163 @@ const Help = () => {
               </CardContent>
             </Card>
 
+            <Card className="border-black/10 mb-6 overflow-hidden">
+              <div className="bg-black/5 p-4 flex items-center gap-3">
+                <Heart className="h-6 w-6 text-black/70" />
+                <div>
+                  <CardTitle>Habit Setup Examples</CardTitle>
+                  <CardDescription>Real-world examples to help you get started</CardDescription>
+                </div>
+              </div>
+              <CardContent className="pt-6">
+                <p className="text-black/70 mb-6">
+                  Here are step-by-step examples of how to set up different types of habits:
+                </p>
+
+                <div className="space-y-8">
+                  {/* Example 1: Basic Positive Habit */}
+                  <div className="border rounded-md overflow-hidden">
+                    <div className="bg-green-50 p-4 border-b border-black/10">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                        <h3 className="font-medium">Daily Exercise (Basic Positive Habit)</h3>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <ol className="space-y-2 pl-7 list-decimal text-sm">
+                        <li>Click "Add Habit" on the dashboard</li>
+                        <li>Enter "Daily Exercise" as the name</li>
+                        <li>Add a description: "30 minutes of physical activity"</li>
+                        <li>Select <strong>Positive Habit</strong> type</li>
+                        <li>Set goal type to <strong>Minimum</strong> with a daily goal of <strong>1</strong></li>
+                        <li>Select <strong>All Days</strong> for frequency</li>
+                        <li>Click "Save"</li>
+                      </ol>
+                      <div className="mt-4 p-3 bg-green-50 rounded-md">
+                        <p className="text-sm">
+                          <strong>How to use:</strong> Each day after exercising, click the check button on your habit card to log your activity. Try to maintain your streak by not missing days.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Example 2: Negative Habit with Tapering */}
+                  <div className="border rounded-md overflow-hidden">
+                    <div className="bg-red-50 p-4 border-b border-black/10">
+                      <div className="flex items-center gap-2">
+                        <XCircle className="h-5 w-5 text-red-600" />
+                        <h3 className="font-medium">Reduce Social Media (Negative Habit with Tapering)</h3>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <ol className="space-y-2 pl-7 list-decimal text-sm">
+                        <li>Click "Add Habit" on the dashboard</li>
+                        <li>Enter "Social Media Usage" as the name</li>
+                        <li>Add a description: "Limit time spent on social media apps"</li>
+                        <li>Select <strong>Negative Habit</strong> type</li>
+                        <li>Set goal type to <strong>Maximum</strong> with a starting limit of <strong>10</strong> (sessions per day)</li>
+                        <li>Enable <strong>Tapering</strong></li>
+                        <li>Set a target date 30 days from now</li>
+                        <li>Set target goal to <strong>2</strong> (allowing yourself just 2 sessions per day)</li>
+                        <li>Select <strong>All Days</strong> for frequency</li>
+                        <li>Click "Save"</li>
+                      </ol>
+                      <div className="mt-4 p-3 bg-red-50 rounded-md">
+                        <p className="text-sm">
+                          <strong>How to use:</strong> Each time you check social media, log it by clicking the plus button. The app will automatically decrease your daily limit over time until you reach your target of 2 sessions per day.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Example 3: Fixed-Days Challenge */}
+                  <div className="border rounded-md overflow-hidden">
+                    <div className="bg-blue-50 p-4 border-b border-black/10">
+                      <div className="flex items-center gap-2">
+                        <Flag className="h-5 w-5 text-blue-600" />
+                        <h3 className="font-medium">30-Day No Sugar Challenge (Fixed-Days Habit)</h3>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <ol className="space-y-2 pl-7 list-decimal text-sm">
+                        <li>Click "Add Habit" on the dashboard</li>
+                        <li>Enter "No Sugar Challenge" as the name</li>
+                        <li>Add a description: "Avoid all added sugars for 30 days"</li>
+                        <li>Select <strong>Negative Habit</strong> type (since you're avoiding sugar)</li>
+                        <li>Set goal type to <strong>Maximum</strong> with a daily limit of <strong>0</strong></li>
+                        <li>Enable <strong>Fixed Days Tracking</strong></li>
+                        <li>Set the target to <strong>30 days</strong></li>
+                        <li>Choose today as your start date</li>
+                        <li>Select <strong>All Days</strong> for frequency</li>
+                        <li>Click "Save"</li>
+                      </ol>
+                      <div className="mt-4 p-3 bg-blue-50 rounded-md">
+                        <p className="text-sm">
+                          <strong>How to use:</strong> Each day you successfully avoid sugar, the app will track your progress toward the 30-day goal. If you consume sugar, log it and your streak will reset. When you complete 30 days, you'll have the option to extend the challenge or archive it.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Example 4: Money-Saving Habit */}
+                  <div className="border rounded-md overflow-hidden">
+                    <div className="bg-emerald-50 p-4 border-b border-black/10">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="h-5 w-5 text-emerald-600" />
+                        <h3 className="font-medium">Quit Smoking (Money-Tracking Habit)</h3>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <ol className="space-y-2 pl-7 list-decimal text-sm">
+                        <li>Click "Add Habit" on the dashboard</li>
+                        <li>Enter "Quit Smoking" as the name</li>
+                        <li>Add a description: "Reduce and eliminate cigarette consumption"</li>
+                        <li>Select <strong>Negative Habit</strong> type</li>
+                        <li>Set goal type to <strong>Maximum</strong> with a starting limit of how many cigarettes you currently smoke daily</li>
+                        <li>Enable <strong>Tapering</strong> and set a quit date 8 weeks from now with a target of 0</li>
+                        <li>Enable <strong>Money Tracking</strong></li>
+                        <li>Enter the cost per cigarette (e.g., $0.50) and select your currency</li>
+                        <li>Select <strong>All Days</strong> for frequency</li>
+                        <li>Click "Save"</li>
+                      </ol>
+                      <div className="mt-4 p-3 bg-emerald-50 rounded-md">
+                        <p className="text-sm">
+                          <strong>How to use:</strong> Each time you smoke, log it by clicking the plus button. The app will show you how much money you're saving compared to your previous consumption. You'll see both daily savings and total money saved since you started reducing.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Example 5: Habit with Specific Days */}
+                  <div className="border rounded-md overflow-hidden">
+                    <div className="bg-purple-50 p-4 border-b border-black/10">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-5 w-5 text-purple-600" />
+                        <h3 className="font-medium">Gym Workout (Specific Days Habit)</h3>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <ol className="space-y-2 pl-7 list-decimal text-sm">
+                        <li>Click "Add Habit" on the dashboard</li>
+                        <li>Enter "Gym Workout" as the name</li>
+                        <li>Add a description: "Strength training routine"</li>
+                        <li>Select <strong>Positive Habit</strong> type</li>
+                        <li>Set goal type to <strong>Minimum</strong> with a daily goal of <strong>1</strong></li>
+                        <li>Select <strong>Specific Days</strong> for frequency</li>
+                        <li>Choose Monday, Wednesday, and Friday</li>
+                        <li>Click "Save"</li>
+                      </ol>
+                      <div className="mt-4 p-3 bg-purple-50 rounded-md">
+                        <p className="text-sm">
+                          <strong>How to use:</strong> You'll only need to log this habit on your selected days. The streak and progress tracking will take into account that you're only expected to do this habit three times per week, not daily.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <Card className="border-black/10 overflow-hidden">
               <div className="bg-black/5 p-4 flex items-center gap-3">
                 <Settings className="h-6 w-6 text-black/70" />
