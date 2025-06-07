@@ -19,7 +19,8 @@ import {
   CalendarDays, 
   Flame, 
   Filter, 
-  SlidersHorizontal 
+  SlidersHorizontal,
+  Sparkles
 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { HabitDialog } from '@/components/habits/HabitDialog';
@@ -227,10 +228,13 @@ const Dashboard = () => {
             </Card>
             
             <Card className="border-blue-100 shadow-sm">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-blue-700">Motivation</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 bg-blue-50 rounded-full">
+                    <Sparkles className="h-4 w-4 text-blue-700" />
+                  </div>
+                  <span className="text-sm font-medium text-blue-700">Daily Inspiration</span>
+                </div>
                 <MotivationalMessage />
               </CardContent>
             </Card>
