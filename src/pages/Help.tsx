@@ -33,7 +33,9 @@ import {
   ThumbsUp,
   ThumbsDown,
   Flag,
-  Archive
+  Archive,
+  Trophy,
+  Medal
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -181,6 +183,10 @@ const Help = () => {
                       <div className="mt-1 text-black/70"><DollarSign className="h-4 w-4" /></div>
                       <span>Track money saved by reducing negative habits like smoking</span>
                     </li>
+                    <li className="flex items-start gap-2">
+                      <div className="mt-1 text-black/70"><Trophy className="h-4 w-4" /></div>
+                      <span>Earn points for completing habits and compete on the leaderboard</span>
+                    </li>
                   </ul>
                 </AccordionContent>
               </AccordionItem>
@@ -216,6 +222,46 @@ const Help = () => {
                     <p className="text-sm">
                       <strong>Pro Tip:</strong> Take a moment to reflect on the motivational message each time it changes. 
                       Consider how you can apply its wisdom to your current habits.
+                    </p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="leaderboard" className="border border-black/10 rounded-lg overflow-hidden">
+                <AccordionTrigger className="text-lg font-medium px-4 hover:bg-black/5 [&[data-state=open]]:bg-black/5">
+                  <div className="flex items-center gap-2">
+                    <Trophy className="h-5 w-5 text-black/70" />
+                    <span>Leaderboard & Points</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 pt-2 pb-4 bg-white">
+                  <p className="mb-4">Habiter includes a competitive element to keep you motivated:</p>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-2">
+                      <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                      <span>Earn points every time you complete a positive habit or avoid a negative one</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="mt-1 text-black/70"><TrendingUp className="h-4 w-4" /></div>
+                      <span>Get bonus points for maintaining streaks (7, 30, and 100 days)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="mt-1 text-black/70"><Trophy className="h-4 w-4" /></div>
+                      <span>Compare your progress with other users on the leaderboard</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="mt-1 text-black/70"><Medal className="h-4 w-4" /></div>
+                      <span>Special badges for top performers (gold, silver, bronze)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                      <span>Access the leaderboard from the main navigation menu</span>
+                    </li>
+                  </ul>
+                  <div className="mt-4 p-3 bg-black/5 rounded-md">
+                    <p className="text-sm">
+                      <strong>Pro Tip:</strong> Use the leaderboard as extra motivation to stay consistent with your habits. 
+                      Invite friends to join and create a friendly competition!
                     </p>
                   </div>
                 </AccordionContent>
@@ -692,6 +738,125 @@ const Help = () => {
                         </p>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-black/10 mb-6 overflow-hidden">
+              <div className="bg-black/5 p-4 flex items-center gap-3">
+                <Trophy className="h-6 w-6 text-black/70" />
+                <div>
+                  <CardTitle>Leaderboard & Points</CardTitle>
+                  <CardDescription>Track your progress against other users</CardDescription>
+                </div>
+              </div>
+              <CardContent className="pt-6">
+                <p className="text-black/70 mb-4">
+                  The leaderboard feature adds a competitive element to your habit journey:
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Earn points for completing your habits and maintaining streaks</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>See how you rank against other users on the leaderboard</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>View the top 20 users with the highest points</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><CheckCircle2 className="h-4 w-4" /></div>
+                    <span>Track your personal stats including total points and current rank</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1 text-black/70"><Trophy className="h-4 w-4" /></div>
+                    <span>Special badges for top performers (gold, silver, and bronze rankings)</span>
+                  </li>
+                </ul>
+                <div className="mt-4 p-3 bg-black/5 rounded-md">
+                  <p className="text-sm">
+                    <strong>Pro Tip:</strong> Use the leaderboard as motivation to stay consistent with your habits. Compete with friends by inviting them to join Habiter and see who can earn the most points!
+                  </p>
+                </div>
+                
+                <div className="mt-6">
+                  <h4 className="font-medium mb-3">How Points Are Earned</h4>
+                  <div className="space-y-3 text-sm">
+                    <div className="p-3 bg-black/5 rounded-md">
+                      <div className="flex items-start gap-2">
+                        <div className="mt-0.5"><CheckCircle2 className="h-4 w-4 text-green-600" /></div>
+                        <div>
+                          <p className="font-medium">Completing Positive Habits</p>
+                          <p className="text-black/70">Earn 10 points each time you complete a positive habit</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-3 bg-black/5 rounded-md">
+                      <div className="flex items-start gap-2">
+                        <div className="mt-0.5"><XCircle className="h-4 w-4 text-red-600" /></div>
+                        <div>
+                          <p className="font-medium">Avoiding Negative Habits</p>
+                          <p className="text-black/70">Earn 10 points each day you stay under your maximum limit for negative habits</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-3 bg-black/5 rounded-md">
+                      <div className="flex items-start gap-2">
+                        <div className="mt-0.5"><TrendingUp className="h-4 w-4 text-blue-600" /></div>
+                        <div>
+                          <p className="font-medium">Streak Bonuses</p>
+                          <p className="text-black/70">Earn bonus points for maintaining streaks:</p>
+                          <ul className="list-disc pl-5 mt-1 space-y-1">
+                            <li>7-day streak: 50 bonus points</li>
+                            <li>30-day streak: 200 bonus points</li>
+                            <li>100-day streak: 500 bonus points</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-3 bg-black/5 rounded-md">
+                      <div className="flex items-start gap-2">
+                        <div className="mt-0.5"><Flag className="h-4 w-4 text-amber-600" /></div>
+                        <div>
+                          <p className="font-medium">Completing Fixed-Day Challenges</p>
+                          <p className="text-black/70">Earn 100 points when you successfully complete a fixed-day challenge</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-6">
+                  <h4 className="font-medium mb-3">Using the Leaderboard</h4>
+                  <ol className="space-y-3 list-decimal pl-5">
+                    <li className="text-black/70">
+                      <span className="font-medium text-black">Access the leaderboard</span> by clicking on the "Leaderboard" link in the main navigation menu
+                    </li>
+                    <li className="text-black/70">
+                      <span className="font-medium text-black">View your stats</span> at the top of the page, including your current rank and total points
+                    </li>
+                    <li className="text-black/70">
+                      <span className="font-medium text-black">See top performers</span> in the leaderboard list below your stats
+                    </li>
+                    <li className="text-black/70">
+                      <span className="font-medium text-black">Identify ranking badges</span> - gold trophy for 1st place, silver medal for 2nd place, bronze medal for 3rd place, and blue award icons for other top 20 positions
+                    </li>
+                    <li className="text-black/70">
+                      <span className="font-medium text-black">Track your progress</span> over time as you earn more points and climb the rankings
+                    </li>
+                  </ol>
+                  <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-md flex items-start gap-2">
+                    <div className="mt-0.5 text-amber-500"><Trophy className="h-4 w-4" /></div>
+                    <p className="text-sm text-amber-700">
+                      The leaderboard updates in real-time as you and other users complete habits and earn points. Check back regularly to see your progress!
+                    </p>
                   </div>
                 </div>
               </CardContent>
