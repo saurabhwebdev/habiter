@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from '@/components/ui/use-toast';
 import { Save, Trash2, AlertTriangle, InfoIcon } from 'lucide-react';
 import { Layout } from '@/components/Layout';
-import { habitService } from '@/lib/habitService';
+import habitService from '@/lib/habitService';
 import { Habit } from '@/types/habit';
 import {
   AlertDialog,

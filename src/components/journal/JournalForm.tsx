@@ -27,9 +27,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { X, Pencil, Calendar, Smile, Tag, Zap } from 'lucide-react';
 import { Habit, NewJournalEntry, MoodType } from '@/types/habit';
-import { habitService } from '@/lib/habitService';
+import habitService from '@/lib/habitService';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { CalendarIcon, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { toast } from '@/components/ui/use-toast';
 
 const formSchema = z.object({
   habit_id: z.string().min(1, { message: 'Please select a habit' }),

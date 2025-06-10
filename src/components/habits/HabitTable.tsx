@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { HabitWithProgress } from '@/types/habit';
 import { CheckCircle2, AlertCircle, ArrowUpCircle, ArrowDownCircle, DollarSign, Minus, Plus, Calendar, Archive, CalendarPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { habitService } from '@/lib/habitService';
+import habitService from '@/lib/habitService';
 import { toast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
 import { 

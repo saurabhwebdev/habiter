@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { habitService } from '@/lib/habitService';
+import habitService from '@/lib/habitService';
 import { toast } from '@/components/ui/use-toast';
 import { Pencil, Info, Edit, DollarSign, Archive, Clock, CalendarPlus } from 'lucide-react';
 import { HabitDialog } from './HabitDialog';
@@ -40,11 +40,24 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onUpdate }) => {
       });
       onUpdate();
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to log habit. Please try again.",
-        variant: "destructive",
-      });
+      console.error('Error logging habit:', error);
+      
+      // Check if it's just a points-related error but the habit was logged
+      if (error instanceof Error && error.message && error.message.includes('user_points')) {
+        // The habit was probably logged but there was an issue with points
+        toast({
+          title: "Habit logged",
+          description: `Added ${count} ${habit.unit}${count > 1 ? 's' : ''} to ${habit.name}, but there was an issue updating points.`,
+        });
+        // Still update the UI
+        onUpdate();
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to log habit. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
       setIsLogging(false);
@@ -307,6 +320,28 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onUpdate }) => {
                 </div>
               </div>
             )}
+            
+            {/* Points Earned Display */}
+            <div className="mt-3 pt-3 border-t border-black/10">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-1">
+                  <span className="text-yellow-500">🏆</span>
+                  <p className="text-sm font-medium text-yellow-600">Points Earned:</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium text-yellow-600">
+                    {habit.points_earned_today || 0} points
+                  </p>
+                  <p className="text-xs text-black/50">Today</p>
+                </div>
+              </div>
+              <div className="flex justify-between items-center mt-1">
+                <p className="text-xs text-black/50">Per completion:</p>
+                <p className="text-xs font-medium">
+                  {habit.points_per_completion || 10} points
+                </p>
+              </div>
+            </div>
           </div>
         </CardContent>
         

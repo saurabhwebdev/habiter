@@ -18,6 +18,7 @@ import Settings from "./pages/Settings";
 import Statistics from "./pages/Statistics";
 import Journal from "./pages/Journal";
 import Archive from "./pages/Archive";
+import Leaderboard from "./pages/Leaderboard";
 import Help from "./pages/Help";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
@@ -65,6 +66,11 @@ const App = () => (
             <Route path="/archive" element={
               <ProtectedRoute>
                 <Archive />
+              </ProtectedRoute>
+            } />
+            <Route path="/leaderboard" element={
+              <ProtectedRoute>
+                <Leaderboard />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

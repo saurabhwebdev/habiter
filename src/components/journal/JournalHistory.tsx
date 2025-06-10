@@ -58,7 +58,7 @@ import {
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Habit, JournalEntry, JournalFilters } from '@/types/habit';
-import { habitService } from '@/lib/habitService';
+import habitService from '@/lib/habitService';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 

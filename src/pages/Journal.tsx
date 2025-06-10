@@ -1,29 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
-import { useToast } from '@/components/ui/use-toast';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { CalendarIcon, Loader2, Search, Plus, PenSquare, History, Clock } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { toast } from '@/components/ui/use-toast';
+import { JournalEntry, JournalFilters, NewJournalEntry, Habit } from '@/types/habit';
 import { JournalForm } from '@/components/journal/JournalForm';
 import { JournalHistory } from '@/components/journal/JournalHistory';
-import { Habit } from '@/types/habit';
-import { habitService } from '@/lib/habitService';
-import { BookOpen, History, Clock } from 'lucide-react';
+import habitService from '@/lib/habitService';
+import { BookOpen } from 'lucide-react';
 
 const Journal = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     const fetchHabits = async () => {
@@ -44,7 +42,7 @@ const Journal = () => {
     };
 
     fetchHabits();
-  }, [toast]);
+  }, []);
 
   // Format date and time
   const formatDate = () => {

@@ -26,6 +26,7 @@ export interface Habit {
   fixed_days_target?: number;
   fixed_days_start_date?: string;
   fixed_days_progress?: number;
+  points_per_completion?: number;
   archived?: boolean;
   archived_at?: string;
   created_at: string;
@@ -40,6 +41,7 @@ export interface HabitLog {
   time: string;
   count: number;
   note?: string;
+  points_earned?: number;
   created_at: string;
 }
 
@@ -73,6 +75,7 @@ export interface HabitWithProgress extends Habit {
   goal_met: boolean;
   money_saved_today?: number;
   total_money_saved?: number;
+  points_earned_today?: number;
 }
 
 export interface NewHabit {
@@ -98,12 +101,14 @@ export interface NewHabit {
   fixed_days_target?: number;
   fixed_days_start_date?: string;
   fixed_days_progress?: number;
+  points_per_completion?: number;
 }
 
 export interface NewHabitLog {
   habit_id: string;
   count: number;
   note?: string;
+  points_earned?: number;
 }
 
 export interface NewMoneySaving {
@@ -152,6 +157,21 @@ export interface JournalFilters {
   date_range?: DateRange;
   mood?: string;
   search?: string;
+}
+
+export interface UserPoints {
+  id: string;
+  user_id: string;
+  total_points: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LeaderboardEntry {
+  user_id: string;
+  total_points: number;
+  username?: string;
+  rank: number;
 }
 
 export const DEFAULT_ICONS: Record<string, string> = {

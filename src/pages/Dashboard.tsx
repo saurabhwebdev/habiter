@@ -3,7 +3,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { HabitWithProgress, HabitType, HabitFilters } from '@/types/habit';
-import { habitService } from '@/lib/habitService';
+import habitService from '@/lib/habitService';
 import { HabitCard } from '@/components/habits/HabitCard';
 import { HabitTable } from '@/components/habits/HabitTable';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,8 @@ import {
   Filter, 
   SlidersHorizontal,
   Sparkles,
-  Clock
+  Clock,
+  Trophy
 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { HabitDialog } from '@/components/habits/HabitDialog';
@@ -51,6 +52,7 @@ const Dashboard = () => {
   const [showCompleted, setShowCompleted] = useState(true);
   const [sortBy, setSortBy] = useState<'progress' | 'name' | 'streak'>('progress');
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [userPoints, setUserPoints] = useState<number>(0);
 
   useEffect(() => {
     // Update time every second
@@ -79,6 +81,12 @@ const Dashboard = () => {
       setIsLoading(true);
       const habitsWithProgress = await habitService.getHabitsWithProgress();
       setHabits(habitsWithProgress);
+      
+      // Fetch user points
+      const userPointsData = await habitService.getUserPoints();
+      if (userPointsData) {
+        setUserPoints(userPointsData.total_points);
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -257,6 +265,27 @@ const Dashboard = () => {
             </Card>
             
             <Card className="border-gray-200 shadow-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-900">Your Points</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-between items-center">
+                  <div className="text-3xl font-bold">{userPoints}</div>
+                  <div className="p-2 bg-gray-100 rounded-full">
+                    <Trophy className="h-5 w-5 text-yellow-600" />
+                  </div>
+                </div>
+                <Button 
+                  variant="link" 
+                  onClick={() => navigate('/leaderboard')}
+                  className="text-sm mt-2 text-blue-600 p-0 h-auto"
+                >
+                  View Leaderboard
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-gray-200 shadow-sm lg:col-span-4">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-2 bg-gray-100 rounded-full">

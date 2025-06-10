@@ -12,7 +12,9 @@ import {
   NewMoneySaving,
   JournalEntry,
   NewJournalEntry,
-  JournalFilters
+  JournalFilters,
+  UserPoints,
+  LeaderboardEntry
 } from '@/types/habit';
 
 export const habitService = {
@@ -199,17 +201,25 @@ export const habitService = {
     const date = now.toISOString().split('T')[0];
     const time = now.toISOString(); // Use full ISO string for timestamp with time zone
     
+    // Get the habit to calculate points
+    const habit = await this.getHabitById(log.habit_id);
+    
+    // Calculate points earned
+    const pointsEarned = habit?.points_per_completion ? habit.points_per_completion * log.count : 10 * log.count;
+    
     // Add the user_id, date, and time to the log object
-    const logWithUserId = {
+    const logWithDetails = {
       ...log,
       user_id: user.id,
-      date: date,
-      time: time
+      date,
+      time,
+      points_earned: pointsEarned
     };
     
+    // First, insert the habit log
     const { data, error } = await supabase
       .from('habit_logs')
-      .insert([logWithUserId])
+      .insert([logWithDetails])
       .select()
       .single();
     
@@ -217,28 +227,42 @@ export const habitService = {
       console.error('Error creating habit log:', error);
       throw error;
     }
-
-    // Check if this is a habit with fixed days tracking
-    const { data: habitData, error: habitError } = await supabase
-      .from('habits')
-      .select('*')
-      .eq('id', log.habit_id)
-      .single();
-
-    if (!habitError && habitData && habitData.fixed_days_enabled) {
-      // Get existing logs for today to check if this is the first log of the day
-      const existingLogs = await this.getHabitLogsForDate(log.habit_id, date);
+    
+    // Update the streak for this habit
+    try {
+      await this.updateStreak(log.habit_id);
+    } catch (streakError) {
+      console.error('Error updating streak:', streakError);
+      // Continue even if streak update fails
+    }
+    
+    // Try to update user points directly
+    try {
+      // Check if user_points record exists
+      const { data: userPointsData } = await supabase
+        .from('user_points')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
       
-      // If this is the first log of the day, increment the fixed_days_progress
-      if (existingLogs.length <= 1) { // 1 because we just created a log
-        // Update the fixed_days_progress
+      if (!userPointsData) {
+        // Create new user_points record
         await supabase
-          .from('habits')
+          .from('user_points')
+          .insert([{ user_id: user.id, total_points: pointsEarned }]);
+      } else {
+        // Update existing user_points record
+        await supabase
+          .from('user_points')
           .update({ 
-            fixed_days_progress: (habitData.fixed_days_progress || 0) + 1 
+            total_points: userPointsData.total_points + pointsEarned,
+            updated_at: new Date().toISOString()
           })
-          .eq('id', log.habit_id);
+          .eq('user_id', user.id);
       }
+    } catch (pointsError) {
+      console.error('Error updating user points:', pointsError);
+      // Continue even if points update fails
     }
     
     return data as HabitLog;
@@ -305,6 +329,87 @@ export const habitService = {
     } catch (error) {
       console.error('Error in getStreak:', error);
       return null;
+    }
+  },
+  
+  async updateStreak(habitId: string): Promise<void> {
+    try {
+      // Get the habit to check its goal type
+      const habit = await this.getHabitById(habitId);
+      if (!habit) {
+        throw new Error('Habit not found');
+      }
+      
+      // Get the current date
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Get logs for today
+      const logsToday = await this.getHabitLogsForDate(habitId, today);
+      
+      // Calculate total for today
+      const totalToday = logsToday.reduce((sum, log) => sum + log.count, 0);
+      
+      // Check if the goal is met for today
+      let goalMet = false;
+      if (habit.goal_type === 'min') {
+        goalMet = totalToday >= habit.daily_goal;
+      } else {
+        goalMet = totalToday <= habit.daily_goal;
+      }
+      
+      // Get or create streak
+      const streak = await this.getStreak(habitId);
+      if (!streak) {
+        return;
+      }
+      
+      // Get yesterday's date
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      
+      let currentStreak = streak.current_streak;
+      let longestStreak = streak.longest_streak;
+      
+      if (goalMet) {
+        // If the goal is met today
+        if (streak.last_successful_day === yesterdayStr) {
+          // Continuing streak
+          currentStreak += 1;
+        } else if (streak.last_successful_day !== today) {
+          // New streak (not continuing and not already counted today)
+          currentStreak = 1;
+        }
+        
+        // Update longest streak if needed
+        if (currentStreak > longestStreak) {
+          longestStreak = currentStreak;
+        }
+        
+        // Update the streak in the database
+        await supabase
+          .from('streaks')
+          .update({
+            current_streak: currentStreak,
+            longest_streak: longestStreak,
+            last_successful_day: today,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', streak.id);
+      }
+      
+      // For fixed days tracking, update progress if this is the first log of the day
+      if (habit.fixed_days_enabled && logsToday.length === 1 && goalMet) {
+        await supabase
+          .from('habits')
+          .update({ 
+            fixed_days_progress: (habit.fixed_days_progress || 0) + 1 
+          })
+          .eq('id', habitId);
+      }
+    } catch (error) {
+      console.error('Error updating streak:', error);
+      throw error;
     }
   },
   
@@ -421,96 +526,73 @@ export const habitService = {
   
   // Get habits with today's progress
   async getHabitsWithProgress(): Promise<HabitWithProgress[]> {
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Get all habits
+    // Get all non-archived habits
     const habits = await this.getHabits();
     
-    // Get today's logs for all habits
-    const habitsWithProgress = await Promise.all(
-      habits.map(async (habit) => {
-        // Get logs for today
-        const logs = await this.getHabitLogsForDate(habit.id, today);
+    // Get the current date
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Process each habit to add progress information
+    const habitsWithProgress = await Promise.all(habits.map(async (habit) => {
+      // Get logs for today
+      const logsToday = await this.getHabitLogsForDate(habit.id, today);
+      
+      // Calculate total for today
+      const totalToday = logsToday.reduce((sum, log) => sum + log.count, 0);
+      
+      // Get streak information
+      const streak = await this.getStreak(habit.id);
+      
+      // Calculate progress percentage
+      let progressPercentage = 0;
+      let goalMet = false;
+      
+      // For tapering habits, get the adjusted goal value
+      let dailyGoal = habit.daily_goal;
+      if (habit.tapering_enabled) {
+        dailyGoal = await this.getTaperedGoalValue(habit.id);
+      }
+      
+      if (habit.goal_type === 'min') {
+        // For minimum goals, progress is current / goal (capped at 100%)
+        progressPercentage = Math.min((totalToday / dailyGoal) * 100, 100);
+        goalMet = totalToday >= dailyGoal;
+      } else {
+        // For maximum goals, progress is (goal - current) / goal (capped at 100%)
+        // Higher is better (means you're further under your max limit)
+        progressPercentage = Math.min(((dailyGoal - totalToday) / dailyGoal) * 100, 100);
+        progressPercentage = Math.max(progressPercentage, 0); // Ensure it's not negative
+        goalMet = totalToday <= dailyGoal;
+      }
+      
+      // Get money savings if enabled
+      let moneySavedToday = 0;
+      let totalMoneySaved = 0;
+      
+      if (habit.money_tracking_enabled) {
+        const moneySavingToday = await this.getMoneySavingForDate(habit.id, today);
+        moneySavedToday = moneySavingToday ? moneySavingToday.amount_saved : 0;
         
-        // Calculate total for today
-        const total = logs.reduce((sum, log) => sum + log.count, 0);
-        
-        // Get streak
-        const streak = await this.getStreak(habit.id);
-        
-        // For negative habits with tapering enabled, get the current tapered goal
-        let effectiveGoal = habit.daily_goal;
-        if (habit.type === 'negative' && habit.tapering_enabled) {
-          try {
-            effectiveGoal = await this.getTaperedGoalValue(habit.id);
-          } catch (error) {
-            console.error('Error getting tapered goal value:', error);
-          }
-        }
-        
-        // Calculate progress percentage
-        let progressPercentage = 0;
-        let goalMet = false;
-        
-        if (habit.goal_type === 'min') {
-          // For min goals (like drink 8 glasses of water)
-          progressPercentage = Math.min(100, (total / effectiveGoal) * 100);
-          goalMet = total >= effectiveGoal;
-        } else {
-          // For max goals (like smoke max 5 cigarettes)
-          progressPercentage = effectiveGoal > 0 
-            ? Math.min(100, (total / effectiveGoal) * 100)
-            : (total > 0 ? 100 : 0);
-          goalMet = total <= effectiveGoal;
-        }
-        
-        // Calculate money saved if money tracking is enabled
-        let moneySavedToday = 0;
-        let totalMoneySaved = 0;
-        
-        if (habit.money_tracking_enabled && habit.cost_per_unit) {
-          // For negative habits, money is saved by not doing the habit
-          if (habit.type === 'negative') {
-            // Calculate how many units were avoided
-            const unitsAvoided = Math.max(0, effectiveGoal - total);
-            moneySavedToday = unitsAvoided * habit.cost_per_unit;
-            
-            // Save today's money saving
-            if (moneySavedToday > 0) {
-              try {
-                await this.createOrUpdateMoneySaving({
-                  habit_id: habit.id,
-                  amount_saved: moneySavedToday
-                });
-              } catch (error) {
-                console.error('Error saving money saving:', error);
-              }
-            }
-          }
-          
-          // Get total money saved for this habit
-          try {
-            totalMoneySaved = await this.getTotalMoneySaved(habit.id);
-          } catch (error) {
-            console.error('Error getting total money saved:', error);
-          }
-        }
-        
-        return {
-          ...habit,
-          logs_today: logs,
-          total_today: total,
-          streak,
-          current_streak: streak?.current_streak || 0,
-          longest_streak: streak?.longest_streak || 0,
-          progress_percentage: progressPercentage,
-          goal_met: goalMet,
-          money_saved_today: moneySavedToday,
-          total_money_saved: totalMoneySaved,
-          daily_goal: effectiveGoal // Override daily_goal with tapered value if applicable
-        };
-      })
-    );
+        totalMoneySaved = await this.getTotalMoneySaved(habit.id);
+      }
+      
+      // Calculate points earned today
+      const pointsEarnedToday = logsToday.reduce((sum, log) => sum + (log.points_earned || 0), 0);
+      
+      return {
+        ...habit,
+        logs_today: logsToday,
+        total_today: totalToday,
+        streak: streak || undefined,
+        current_streak: streak?.current_streak || 0,
+        longest_streak: streak?.longest_streak || 0,
+        progress_percentage: progressPercentage,
+        goal_met: goalMet,
+        money_saved_today: moneySavedToday,
+        total_money_saved: totalMoneySaved,
+        points_earned_today: pointsEarnedToday
+      };
+    }));
     
     return habitsWithProgress;
   },
@@ -773,4 +855,115 @@ export const habitService = {
     
     return data as Habit;
   },
-}; 
+
+  // Points and Leaderboard operations
+  async getUserPoints(): Promise<UserPoints | null> {
+    // Get the current user ID
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+    
+    const { data, error } = await supabase
+      .from('user_points')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned" error
+      console.error('Error fetching user points:', error);
+      throw error;
+    }
+    
+    // If no points record exists yet, create one
+    if (!data) {
+      const { data: newData, error: createError } = await supabase
+        .from('user_points')
+        .insert([{ user_id: user.id, total_points: 0 }])
+        .select()
+        .single();
+      
+      if (createError) {
+        console.error('Error creating user points:', createError);
+        throw createError;
+      }
+      
+      return newData as UserPoints;
+    }
+    
+    return data as UserPoints;
+  },
+  
+  async getLeaderboard(limit: number = 10): Promise<LeaderboardEntry[]> {
+    // Get the current user ID for highlighting in the UI
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+    
+    try {
+      // First get all user points
+      const { data: pointsData, error: pointsError } = await supabase
+        .from('user_points')
+        .select('*')
+        .order('total_points', { ascending: false })
+        .limit(limit);
+      
+      if (pointsError) {
+        console.error('Error fetching user points:', pointsError);
+        throw pointsError;
+      }
+      
+      // Get user profiles separately
+      const userIds = pointsData.map((entry: any) => entry.user_id);
+      
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, username')
+        .in('id', userIds);
+      
+      if (profilesError) {
+        console.error('Error fetching user profiles:', profilesError);
+        // Continue even if profiles fetch fails
+      }
+      
+      // Create a map of user_id to username
+      const profileMap = new Map();
+      if (profilesData) {
+        profilesData.forEach((profile: any) => {
+          profileMap.set(profile.id, profile.username);
+        });
+      }
+      
+      // Transform the data to include rank and username
+      const leaderboard = pointsData.map((entry: any, index) => ({
+        user_id: entry.user_id,
+        total_points: entry.total_points,
+        username: profileMap.get(entry.user_id) || 'Anonymous User',
+        rank: index + 1
+      }));
+      
+      return leaderboard as LeaderboardEntry[];
+    } catch (error) {
+      console.error('Error in getLeaderboard:', error);
+      // Return empty leaderboard rather than crashing
+      return [];
+    }
+  },
+  
+  async addPointsToUser(userId: string, points: number): Promise<void> {
+    const { error } = await supabase.rpc('add_points_to_user', {
+      user_id_param: userId,
+      points_param: points
+    });
+    
+    if (error) {
+      console.error('Error adding points to user:', error);
+      throw error;
+    }
+  }
+};
+
+export default habitService; 

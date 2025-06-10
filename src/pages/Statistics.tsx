@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { habitService } from '@/lib/habitService';
+import habitService from '@/lib/habitService';
 import { HabitWithProgress, HabitLog } from '@/types/habit';
 import { toast } from '@/components/ui/use-toast';
 import { Layout } from '@/components/Layout';

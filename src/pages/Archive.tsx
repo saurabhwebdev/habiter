@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
+import habitService from '@/lib/habitService';
 import { HabitWithProgress } from '@/types/habit';
-import { habitService } from '@/lib/habitService';
 import { toast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

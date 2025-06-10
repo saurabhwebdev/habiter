@@ -10,7 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { habitService } from '@/lib/habitService';
+import habitService from '@/lib/habitService';
 import { toast } from '@/components/ui/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format } from 'date-fns';
@@ -43,7 +43,8 @@ const habitSchema = z.object({
   fixed_days_enabled: z.boolean().default(false),
   fixed_days_target: z.coerce.number().optional(),
   fixed_days_start_date: z.string().optional(),
-  fixed_days_progress: z.coerce.number().optional()
+  fixed_days_progress: z.coerce.number().optional(),
+  points_per_completion: z.coerce.number().min(0, 'Points must be at least 0').default(10)
 }).refine((data) => {
   // For positive habits, ensure daily goal is at least 1
   if (data.type === 'positive' && data.daily_goal < 1) {
@@ -82,7 +83,8 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel
           fixed_days_enabled: habit.fixed_days_enabled || false,
           fixed_days_target: habit.fixed_days_target || 30,
           fixed_days_start_date: habit.fixed_days_start_date || format(new Date(), 'yyyy-MM-dd'),
-          fixed_days_progress: habit.fixed_days_progress || 0
+          fixed_days_progress: habit.fixed_days_progress || 0,
+          points_per_completion: habit.points_per_completion || 10
         }
       : {
           name: '',
@@ -106,7 +108,8 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel
           fixed_days_enabled: false,
           fixed_days_target: 30,
           fixed_days_start_date: format(new Date(), 'yyyy-MM-dd'),
-          fixed_days_progress: 0
+          fixed_days_progress: 0,
+          points_per_completion: 10
         }
   });
 
@@ -380,6 +383,29 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess, onCancel
               )}
             />
           </div>
+          
+          {/* Points per Completion */}
+          <FormField
+            control={form.control}
+            name="points_per_completion"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Points per Completion</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    min="0"
+                    {...field} 
+                    className="border-black/20 focus:border-black"
+                  />
+                </FormControl>
+                <FormDescription>
+                  Points earned each time you log this habit (multiplied by count)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           
           {/* Icon Selection */}
           <FormField
